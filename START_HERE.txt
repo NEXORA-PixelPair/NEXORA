@@ -1,0 +1,25 @@
+NEXORA 2.0 - START HERE
+
+1. Install Node.js LTS: https://nodejs.org/
+2. Extract this ZIP and open the nexora folder in VS Code.
+3. Open Terminal -> New Terminal. If PowerShell blocks npm.ps1, use npm.cmd in place of npm.
+4. Copy environment examples:
+   Copy-Item server/.env.example server/.env
+   Copy-Item client/.env.example client/.env
+5. Install dependencies:
+   npm.cmd install
+   npm.cmd run install:all
+6. Start frontend and backend:
+   npm.cmd run dev
+7. Open http://localhost:5173
+8. Choose Enter mock database to explore the separate sample workspace without login or GitHub, OR create/sign in to an account.
+9. For Google and GitHub OAuth, configure the provider credentials in server/.env. See README.md for exact callback URLs and setup.
+10. For AI-generated pass-on reports, add OPENAI_API_KEY and OPENAI_MODEL to server/.env.
+
+No VS Code extensions are required. Real Google, GitHub and OpenAI services require your own provider credentials and internet access.
+
+BRAND / ACCOUNT SWITCHING UPDATE
+- Your supplied NEXORA wordmark and orbital N logo are in client/public/brand/.
+- The app now includes a profile dropdown at the top-right with Dark mode, Light mode, and Log out. Theme choice is remembered in this browser.
+- On every new sign-in and sign-out, account-owned UI state is reset. AI conversation state is cleared and responses from an older account session are discarded.
+- Use Inter for UI/body text and Poppins for bold headings. Instruction/help notes use italics.
