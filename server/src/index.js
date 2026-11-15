@@ -491,26 +491,174 @@ app.post('/api/risks/scan', auth, async (req, res) => {
   }
   res.json({ created: created.length, risks: await listOwned('risks', req.ownerId) });
 });
+function parseJsonIfPossible(value) {
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  if (!trimmed || !((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']')))) return value;
+  try { return JSON.parse(trimmed); } catch { return value; }
+}
+
+function readableValue(value, depth = 0) {
+  value = parseJsonIfPossible(value);
+  if (value == null) return '';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (depth > 3) return '';
+  if (Array.isArray(value)) return value.map(item => readableValue(item, depth + 1)).filter(Boolean).map(item => `- ${item}`).join('\n');
+  if (typeof value === 'object') {
+    return Object.entries(value).map(([key, item]) => {
+      const label = key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]/g, ' ').replace(/^./, c => c.toUpperCase());
+      const text = readableValue(item, depth + 1);
+      return text ? `${label}: ${text}` : '';
+    }).filter(Boolean).join('\n');
+  }
+  return '';
+}
+
+function reportToReadableText(value) {
+  const report = parseJsonIfPossible(value);
+  if (!report || typeof report !== 'object' || Array.isArray(report)) return readableValue(report);
+  const sections = [
+    ['executiveSummary', 'Executive summary'], ['projectPurpose', 'Project purpose'],
+    ['architectureAndTechnology', 'Architecture and technology'], ['dependenciesAndRuntime', 'Dependencies and runtime'],
+    ['setup', 'Setup'], ['recentActivity', 'Recent activity'], ['openWork', 'Open work'],
+    ['pullRequests', 'Pull requests'], ['ownershipAndContributors', 'Ownership and contributors'],
+    ['knowledgeDependencies', 'Knowledge dependencies'], ['decisionsAndConventions', 'Decisions and conventions'],
+    ['risksAndKnowledgeGaps', 'Risks and knowledge gaps'], ['riskSignals', 'Risk signals'],
+    ['recommendedNextSteps', 'Recommended next steps'], ['coverageNotes', 'Coverage notes'],
+    ['limitation', 'Limitations'], ['reviewGuidance', 'Review guidance'], ['confidenceLevel', 'Confidence level']
+  ];
+  const lines = [];
+  if (report.repository) {
+    const repo = report.repository;
+    const identity = [repo.fullName || repo.full_name, repo.primaryLanguage || repo.language, repo.defaultBranch || repo.default_branch].filter(Boolean).join(' · ');
+    if (identity) lines.push(`Repository: ${identity}`);
+  }
+  const used = new Set(['repository', 'sourceEvidence', 'generatedAt', 'aiProvider', 'aiGenerationError', 'reviewGuidance', 'confidenceLevel']);
+  for (const [key, label] of sections) {
+    if (report[key] == null || report[key] === '') continue;
+    used.add(key);
+    const text = readableValue(report[key]);
+    if (text) lines.push(`${label}:\n${text}`);
+  }
+  if (Array.isArray(report.sourceEvidence) && report.sourceEvidence.length) {
+    used.add('sourceEvidence');
+    const rows = report.sourceEvidence.slice(0, 12).map(item => {
+      const source = item.source || item.label || item.id || 'Repository source';
+      const detail = item.detail || item.description || '';
+      return `- ${source}${detail ? `: ${detail}` : ''}${item.url ? ` (${item.url})` : ''}`;
+    });
+    lines.push(`Supporting evidence:\n${rows.join('\n')}`);
+  }
+  // Preserve any additional useful report fields without emitting serialized JSON.
+  for (const [key, item] of Object.entries(report)) {
+    if (used.has(key) || item == null || item === '') continue;
+    const text = readableValue(item);
+    if (text) {
+      const label = key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]/g, ' ').replace(/^./, c => c.toUpperCase());
+      lines.push(`${label}:\n${text}`);
+    }
+  }
+  return lines.join('\n\n');
+}
+
+function assistantSmallTalk(question) {
+  const q = question.toLowerCase().trim().replace(/[.!?]+$/g, '').replace(/\s+/g, ' ');
+  if (/^(hi|hello|hello there|hey|hey there|hi there|good morning|good afternoon|good evening)$/.test(q)) {
+    return "Hey! I'm NEXORA Intelligence. I can help you understand your connected repositories, saved PASS-on reports, project documentation, open work and knowledge risks. Ask me something like: “Summarise the PhoenixTest report” or “What should the next developer do first?”";
+  }
+  if (/^(how are you|how are you doing|what's up|whats up)$/.test(q)) {
+    return "I'm ready to help! Connect a GitHub repository or add project documentation, and I can answer questions using the knowledge saved in your NEXORA account.";
+  }
+  if (/^(thanks|thank you|thx)$/.test(q)) return "You're welcome! Ask me whenever you need help understanding a project or preparing a handover.";
+  if (/^(help|what can you do|what do you do|how do i use you)$/.test(q)) {
+    return "I can search this account's saved sources and PASS-on reports, explain repository setup and activity, summarise open work, surface documented risks, and suggest handover questions. I will say when the available evidence does not support an answer.";
+  }
+  return null;
+}
+
 app.post('/api/ai/ask', auth, async (req, res) => {
-  const question = String(req.body?.question || '').trim(); if (!question) return res.status(400).json({ message: 'Enter a question.' });
+  const question = String(req.body?.question || '').trim();
+  if (!question) return res.status(400).json({ message: 'Enter a question.' });
+
+  // Greetings and product-help questions should not require repository evidence.
+  const smallTalk = assistantSmallTalk(question);
+  if (smallTalk) return res.json({ answer: smallTalk, sources: [], grounded: false, provider: 'NEXORA assistant' });
+
   const [sources, reports] = await Promise.all([listOwned('sources', req.ownerId), listOwned('reports', req.ownerId)]);
-  const terms = question.toLowerCase().split(/\W+/).filter(t => t.length > 2);
-  const pool = [...sources.map(s => ({ label: s.name, text: s.content || s.summary || '' })), ...reports.map(r => ({ label: r.title, text: JSON.stringify(r.report || {}) }))];
-  const evidence = pool.map(p => ({ ...p, score: terms.reduce((score,t) => score + (p.text.toLowerCase().includes(t) || p.label.toLowerCase().includes(t) ? 1 : 0), 0) })).sort((a,b) => b.score-a.score).filter(p=>p.score>0).slice(0,5);
-  let answer = 'I could not find direct supporting evidence in this account yet. Connect a GitHub repository or add project documentation, then ask again.';
-  if (process.env.GROQ_API_KEY && evidence.length) {
+  const poolByLabel = new Map();
+
+  for (const source of sources) {
+    const label = String(source.name || source.title || 'Project document').trim();
+    const text = readableValue(source.content || source.summary || source.text || '').slice(0, 9000);
+    if (!text) continue;
+    const key = label.toLowerCase();
+    const existing = poolByLabel.get(key);
+    poolByLabel.set(key, existing ? { ...existing, text: `${existing.text}\n\n${text}`.slice(0, 12000) } : { label, text });
+  }
+
+  // Prefer the latest saved snapshot for a repository; do not expose raw JSON.stringify(report).
+  const orderedReports = [...reports].sort((a, b) => new Date(b.createdAt || b.generatedAt || 0).getTime() - new Date(a.createdAt || a.generatedAt || 0).getTime());
+  const seenRepositories = new Set();
+  for (const saved of orderedReports) {
+    const identity = String(saved.repoFullName || saved.repoUrl || saved.title || saved._id).toLowerCase();
+    if (seenRepositories.has(identity)) continue;
+    seenRepositories.add(identity);
+    const label = String(saved.title || saved.repoFullName || 'PASS-on report').trim();
+    const text = reportToReadableText(saved.report || saved.summary || '').slice(0, 14000);
+    if (!text) continue;
+    poolByLabel.set(`report:${identity}`, { label, text });
+  }
+
+  const pool = [...poolByLabel.values()];
+  const stopWords = new Set(['the','and','for','you','your','are','was','were','what','which','who','why','when','where','how','does','did','can','could','would','should','tell','show','give','me','about','from','into','with','that','this','these','those','have','has','had','not','all','any','our','their','its','they','them','then','than','please','explain','summarise','summarize','summary']);
+  const terms = [...new Set((question.toLowerCase().match(/[a-z0-9]+/g) || []).filter(term => term.length > 2 && !stopWords.has(term)))];
+  if (!terms.length) {
+    return res.json({ answer: "What would you like to know about your projects? Try asking about a repository's architecture, setup, recent activity, open issues, risks or handover recommendations.", sources: [], grounded: false, provider: 'NEXORA assistant' });
+  }
+
+  const normaliseForSearch = value => ` ${String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()} `;
+  const scoreEvidence = item => {
+    const haystack = normaliseForSearch(`${item.label} ${item.text}`);
+    const label = normaliseForSearch(item.label);
+    const hits = terms.filter(term => haystack.includes(` ${term} `) || haystack.includes(` ${term}s `) || haystack.includes(` ${term}ing `));
+    const labelHits = terms.filter(term => label.includes(` ${term} `)).length;
+    return { ...item, score: hits.length + labelHits * 2 };
+  };
+  const evidence = pool.map(scoreEvidence).filter(item => item.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
+
+  if (!evidence.length) {
+    const available = pool.slice(0, 4).map(item => item.label);
+    const hint = available.length ? ` I can currently search: ${[...new Set(available)].join(', ')}.` : ' This account does not have any saved sources or PASS-on reports yet.';
+    return res.json({
+      answer: `I couldn't find supporting information for that question in this account's saved project knowledge.${hint} Try asking about a specific repository, report section, setup step, recent commit or open issue.`,
+      sources: [], grounded: false, provider: 'Evidence retrieval'
+    });
+  }
+
+  if (process.env.GROQ_API_KEY) {
     try {
       const assistantSchema = { type: 'object', additionalProperties: false, properties: { answer: { type: 'string' }, sources: { type: 'array', items: { type: 'string' } } }, required: ['answer','sources'] };
-      const generated = await groqJson('You are NEXORA, an evidence-first project knowledge assistant. Answer only from provided evidence. Clearly separate facts, unknowns and recommendations. Cite the provided source labels. Return a JSON object with answer and sources.', JSON.stringify({ question, evidence }), 'nexora_grounded_answer', assistantSchema);
-      answer = generated.answer || answer;
-      const allowedSources = new Set(evidence.map(item => item.label));
-      const groundedSources = Array.isArray(generated.sources) ? [...new Set(generated.sources.filter(label => allowedSources.has(label)))] : [];
-      return res.json({ answer, sources: groundedSources.length ? groundedSources : evidence.map(e => e.label), grounded: true, provider: process.env.GROQ_MODEL || 'openai/gpt-oss-120b' });
+      const generated = await groqJson(
+        'You are NEXORA, an evidence-first project knowledge assistant. Answer the user question in clear, natural prose. Do not expose JSON, field names or serialized objects. Answer only from the supplied account-specific evidence. Separate observed facts, unknowns and recommendations. Do not infer undocumented decisions or claim contributor activity proves knowledge ownership. Cite only the supplied source labels. If evidence is insufficient, say exactly what is unknown. Return the required JSON object.',
+        JSON.stringify({ question, evidence: evidence.map(item => ({ label: item.label, text: item.text.slice(0, 9000) })) }),
+        'nexora_grounded_answer', assistantSchema
+      );
+      if (generated && typeof generated.answer === 'string' && generated.answer.trim()) {
+        const allowedSources = new Set(evidence.map(item => item.label));
+        const groundedSources = Array.isArray(generated.sources) ? [...new Set(generated.sources.filter(label => allowedSources.has(label)))] : [];
+        return res.json({ answer: generated.answer.trim(), sources: groundedSources.length ? groundedSources : [...new Set(evidence.map(item => item.label))], grounded: true, provider: process.env.GROQ_MODEL || 'openai/gpt-oss-120b' });
+      }
+      throw new Error('Groq returned an empty assistant answer.');
+    } catch (error) {
+      console.error('NEXORA assistant Groq synthesis failed:', error.message);
     }
-    catch (error) { console.error('AI Q&A failed:', error.message); }
   }
-  if (evidence.length) answer = `${evidence.map(e => `From ${e.label}: ${e.text.slice(0, 900)}`).join('\n\n')}\n\nThis is a source excerpt, not a verified conclusion. ${process.env.GROQ_API_KEY ? 'Groq was unavailable for this request.' : 'Add GROQ_API_KEY to Render to enable AI synthesis.'}`;
-  res.json({ answer, sources: evidence.map(e=>e.label), grounded: evidence.length > 0, provider: 'Evidence retrieval fallback' });
+
+  // Clean, readable fallback: never send raw serialized report JSON to the chat UI.
+  const excerpt = evidence.slice(0, 3).map(item => `${item.label}\n${item.text.slice(0, 1100)}`).join('\n\n');
+  const reason = process.env.GROQ_API_KEY ? 'Groq could not synthesise this answer right now.' : 'Groq is not configured on the backend.';
+  const answer = `${reason} I found the following relevant saved evidence instead:\n\n${excerpt}\n\nTreat this as retrieved source material, not a verified conclusion. Please confirm important decisions with a project maintainer.`;
+  res.json({ answer, sources: [...new Set(evidence.map(item => item.label))], grounded: true, provider: 'Evidence retrieval fallback' });
 });
 
 app.use((error, _req, res, _next) => { console.error(error); res.status(500).json({ message: process.env.NODE_ENV === 'production' ? 'An unexpected server error occurred.' : error.message || 'Server error.' }); });
