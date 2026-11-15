@@ -23,9 +23,9 @@ const schemas = {
     authProviders: [String], role: { type: String, default: 'member' }
   }, { timestamps: true }),
   Project: new mongoose.Schema({ ownerId: { type: String, index: true }, name: String, description: String, status: String }, { timestamps: true }),
-  Report: new mongoose.Schema({ ownerId: { type: String, index: true }, repoFullName: String, repoUrl: String, title: String, summary: String, report: mongoose.Schema.Types.Mixed, createdBy: String, status: { type: String, default: 'pending_review' }, reviewedBy: String, reviewedAt: Date }, { timestamps: true }),
+  Report: new mongoose.Schema({ ownerId: { type: String, index: true }, repoFullName: String, repoUrl: String, title: String, summary: String, report: mongoose.Schema.Types.Mixed, createdBy: String, status: { type: String, default: 'pending_review' }, reviewedBy: String, reviewedAt: Date, sourceSnapshotAt: Date, aiProvider: String, reviewHistory: [mongoose.Schema.Types.Mixed] }, { timestamps: true }),
   Source: new mongoose.Schema({ ownerId: { type: String, index: true }, projectId: String, name: String, type: String, summary: String, content: String, sourceUrl: String }, { timestamps: true }),
-  Risk: new mongoose.Schema({ ownerId: { type: String, index: true }, projectId: String, title: String, description: String, severity: String, resolved: Boolean }, { timestamps: true })
+  Risk: new mongoose.Schema({ ownerId: { type: String, index: true }, projectId: String, repoFullName: String, sourceReportId: String, title: String, description: String, severity: String, category: String, type: String, evidenceIds: [String], evidenceUrls: [String], recommendedAction: String, resolved: { type: Boolean, default: false } }, { timestamps: true })
 };
 const models = Object.fromEntries(Object.entries(schemas).map(([name, schema]) => [name, mongoose.models[name] || mongoose.model(name, schema)]));
 
