@@ -1,4 +1,4 @@
-# NEXORA 2.0 — The Intelligence That Remains
+# NEXORA — The Intelligence That Remains
 
 A redesigned NEXORA knowledge-continuity platform based on the original 12-page Pixel Pair proposal. This release keeps the proposal's core workflow (connect, ingest, reconstruct, build project memory, verify, assess knowledge risk, review/approve, permissions, handover and continuity) while changing the product UI and repository workflow.
 
