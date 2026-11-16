@@ -1,0 +1,5 @@
+.env
+/data/nexora-db.json
+/data/*.tmp
+node_modules/
+/data/nexora-mock-db.json
