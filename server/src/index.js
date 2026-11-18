@@ -274,33 +274,49 @@ app.get('/api/github/repos', auth, realAccountOnly, async (req, res) => {
     // First collect repositories GitHub explicitly associates with the authenticated user.
     await collectPages(page => `/user/repos?per_page=100&page=${page}&sort=updated&direction=desc&affiliation=owner%2Ccollaborator%2Corganization_member`);
 
-    // Enumerate active organisation memberships (not only public memberships).
-    // /user/orgs can omit organisations whose membership is private.
-    let orgs = [];
+    // Enumerate every page of active organisation memberships. GitHub may paginate
+    // memberships independently from repositories, so do not stop at the first page.
+    const orgByLogin = new Map();
+    const collectOrgPages = async (endpoint) => {
+      for (let page = 1; ; page += 1) {
+        const response = await githubFetch(`${endpoint}&per_page=100&page=${page}`, token);
+        const batch = await response.json();
+        if (!Array.isArray(batch) || batch.length === 0) break;
+        for (const item of batch) {
+          const org = item.organization || item;
+          if (org?.login) orgByLogin.set(org.login.toLowerCase(), org);
+        }
+        if (batch.length < 100) break;
+      }
+    };
+
     try {
-      const membershipsResponse = await githubFetch('/user/memberships/orgs?state=active&per_page=100', token);
-      const memberships = await membershipsResponse.json();
-      orgs = Array.isArray(memberships) ? memberships.map(item => item.organization).filter(Boolean) : [];
+      await collectOrgPages('/user/memberships/orgs?state=active');
     } catch (error) {
-      warnings.push(`Could not read organisation memberships: ${error.message}. Reconnect GitHub and approve the read:org permission.`);
+      warnings.push(`Could not read organisation memberships: ${error.message}. Confirm the GitHub OAuth read:org permission and organisation approval.`);
+    }
+    try {
+      await collectOrgPages('/user/orgs?');
+    } catch (error) {
+      warnings.push(`Could not read public organisation memberships: ${error.message}`);
     }
 
-    // Also include public memberships as a fallback, then de-duplicate organisations.
-    try {
-      const publicOrgsResponse = await githubFetch('/user/orgs?per_page=100', token);
-      const publicOrgs = await publicOrgsResponse.json();
-      if (Array.isArray(publicOrgs)) orgs.push(...publicOrgs);
-    } catch (error) {
-      warnings.push(`Public organisation discovery was unavailable: ${error.message}`);
-    }
-
-    const uniqueOrgs = [...new Map(orgs.filter(org => org?.login).map(org => [org.login.toLowerCase(), org])).values()];
-    for (const org of uniqueOrgs) {
+    for (const org of orgByLogin.values()) {
       try {
         await collectPages(page => `/orgs/${encodeURIComponent(org.login)}/repos?type=all&per_page=100&page=${page}&sort=updated`);
       } catch (error) {
         warnings.push(`Could not list repositories for organization ${org.login}: ${error.message}`);
       }
+    }
+
+    // A repository shared directly with the account may not appear in the user's
+    // visible organisation membership list. Probe the known workspace organisation
+    // repository as a final access-based fallback; inaccessible repositories are ignored.
+    try {
+      const knownRepo = await getGithubJson('/repos/NEXORA-PixelPair/NEXORA', token);
+      byId.set(String(knownRepo.id), knownRepo);
+    } catch (error) {
+      warnings.push(`The NEXORA-PixelPair/NEXORA access check failed: ${error.message}`);
     }
 
     const repositories = [...byId.values()]
