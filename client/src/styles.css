@@ -822,3 +822,31 @@ body{background:#001317;color:var(--offwhite)}
   .reference-login .login-panel-wrap{width:100%;max-width:440px}
   .reference-login .login-card{padding:22px 18px}
 }
+
+
+/* Project Intelligence Engine: source ingestion and cross-source analysis */
+.intelligence-source-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0}
+.intelligence-source-strip>div{display:grid;grid-template-columns:38px 1fr;column-gap:11px;align-items:center;padding:15px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.intelligence-source-strip .teal-icon{grid-row:span 2;width:38px;height:38px}
+.intelligence-source-strip b{font-size:13px}
+.intelligence-source-strip small{font-size:11px;line-height:1.45;color:var(--muted)}
+.memory-form select{width:100%;min-height:44px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg-deep);color:var(--offwhite);outline:none}
+.memory-form input[type=file]{width:100%;padding:11px;border:1px dashed var(--line);border-radius:10px;background:var(--bg-deep);color:var(--muted);font-size:12px}
+.memory-form input[type=file]::file-selector-button{margin-right:12px;padding:8px 11px;border:1px solid var(--line);border-radius:7px;background:var(--surface-soft);color:var(--offwhite);cursor:pointer}
+.source-file-label{margin-bottom:0}
+.analysis-result{margin-top:22px;padding:20px;border:1px solid rgba(43,167,154,.35);border-radius:16px;background:linear-gradient(145deg,rgba(20,127,120,.12),var(--surface) 60%)}
+.analysis-result-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.analysis-result-head h2{margin:4px 0 0;font-size:20px}
+.analysis-overview{font-size:14px;line-height:1.7;color:var(--offwhite)}
+.analysis-meta{font-size:11px;color:var(--muted);padding-bottom:13px;border-bottom:1px solid var(--line)}
+.analysis-section{padding:14px 0;border-bottom:1px solid var(--line)}
+.analysis-section:last-child{border-bottom:0}
+.analysis-section h3{font-size:13px;margin:0 0 9px;color:var(--teal-bright)}
+.analysis-section ul{margin:0;padding-left:19px;display:grid;gap:7px}
+.analysis-section li{font-size:13px;line-height:1.6;color:var(--offwhite)}
+.analysis-risk{padding:11px 0;border-top:1px solid var(--line)}
+.analysis-risk>b{display:flex;align-items:center;gap:8px;font-size:13px}
+.analysis-risk p{font-size:12px;line-height:1.55;color:var(--muted);margin:7px 0}
+.analysis-risk small{font-size:11px;color:var(--muted-dark)}
+@media(max-width:1000px){.intelligence-source-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.intelligence-source-strip{grid-template-columns:1fr}.analysis-result{padding:15px}.analysis-result-head{align-items:flex-start;flex-direction:column}}
