@@ -850,3 +850,16 @@ body{background:#001317;color:var(--offwhite)}
 .analysis-risk small{font-size:11px;color:var(--muted-dark)}
 @media(max-width:1000px){.intelligence-source-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.intelligence-source-strip{grid-template-columns:1fr}.analysis-result{padding:15px}.analysis-result-head{align-items:flex-start;flex-direction:column}}
+
+
+/* Evidence-grounded Project Knowledge Reconstruction report */
+.reconstruction-result{margin-top:22px;padding:22px;border:1px solid rgba(198,166,107,.42);border-radius:18px;background:linear-gradient(145deg,rgba(198,166,107,.09),var(--surface) 48%,rgba(20,127,120,.08))}
+.reconstruction-result .analysis-result-head h2{font-size:21px}
+.reconstruction-item{padding:12px 0;border-top:1px solid var(--line)}
+.reconstruction-item>b{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--offwhite)}
+.reconstruction-item>span{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:var(--surface-soft);font-size:10px;color:var(--muted)}
+.reconstruction-item p{margin:7px 0;font-size:12px;line-height:1.6;color:var(--muted)}
+.reconstruction-item small{font-size:11px;line-height:1.55;color:var(--muted-dark)}
+.reconstruction-status{font-size:10px;font-weight:500;color:var(--champagne,#c6a66b);text-transform:uppercase;letter-spacing:.06em}
+.reconstruction-result .analysis-section h3{color:var(--champagne,#c6a66b)}
+.reconstruction-result .analysis-section li{font-size:12px;line-height:1.6}
