@@ -772,3 +772,53 @@ body{background:#001317;color:var(--offwhite)}
 
 .reference-login .reference-socials{gap:24px}
 .reference-login .bottom-socials{gap:24px}
+
+
+/* Full NEXORA illustrated artwork behind the interactive sign-in panel.
+   Add the supplied asset at client/public/nexora-login-background.jpg. */
+.reference-login{
+  position:relative;
+  display:grid;
+  min-height:100svh;
+  height:100svh;
+  overflow:hidden;
+  grid-template-columns:1fr;
+  grid-template-rows:1fr;
+  place-items:center;
+  padding:24px;
+  background:#000b10 url('/nexora-login-background.jpg') center center / cover no-repeat;
+}
+.reference-login>.login-topbar,
+.reference-login>.login-landscape,
+.reference-login>.login-showcase,
+.reference-login>.login-insights,
+.reference-login>.login-bottomline{display:none!important}
+.reference-login .login-panel-wrap{
+  grid-column:1;
+  grid-row:1;
+  width:min(505px,calc(100vw - 32px));
+  max-width:505px;
+  padding:0;
+  margin:0;
+  z-index:2;
+  align-self:center;
+  justify-self:center;
+}
+.reference-login .login-card{
+  width:100%;
+  max-width:505px;
+  background:linear-gradient(145deg,rgba(0,20,25,.94),rgba(0,10,15,.94));
+  border:1px solid rgba(31,235,229,.82);
+  box-shadow:0 0 0 1px rgba(13,188,188,.2),0 0 38px rgba(0,230,225,.25),inset 0 0 38px rgba(0,182,184,.08);
+  backdrop-filter:blur(12px);
+}
+@media(max-width:600px){
+  .reference-login{
+    min-height:100svh;
+    height:auto;
+    padding:18px 12px;
+    background-position:center center;
+  }
+  .reference-login .login-panel-wrap{width:100%;max-width:440px}
+  .reference-login .login-card{padding:22px 18px}
+}
