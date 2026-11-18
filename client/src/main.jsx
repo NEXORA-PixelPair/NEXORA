@@ -295,7 +295,71 @@ function PixelPairIntro({ onComplete }) {
 }
 
 function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, onMock, busy, notice }) {
-  return <div className="login-screen"><div className="login-decoration"><div className="login-orbit orbit-a"/><div className="login-orbit orbit-b"/><div className="login-center"><div className="login-mark-plaque"><img className="login-logo-mark" src="/brand/nexora-mark.png" alt="NEXORA orbital N logo"/></div><span>BUILD · PRESERVE · CONTINUE</span></div><div className="login-side-copy"><span>01 / KNOWLEDGE CONTINUITY</span><h2>When people move on,<br/><em>knowledge moves forward.</em></h2><p>One connected memory for the decisions, context and work that make a project possible.</p></div></div><div className="login-panel-wrap"><div className="login-card"><div className="login-brand"><div className="brand-plaque login-brand-plaque"><img className="login-wordmark" src="/brand/nexora-wordmark.png" alt="NEXORA — The Intelligence That Remains"/></div></div><div className="login-intro"><div className="eyebrow">YOUR KNOWLEDGE SPACE</div><h1>{authTab === 'register' ? 'Create your account.' : 'Welcome back.'}</h1><p>{authTab === 'register' ? 'Start preserving the knowledge behind your work.' : 'Sign in to continue where your team left off.'}</p></div><div className="auth-tabs"><button className={authTab === 'login' ? 'selected' : ''} onClick={() => setAuthTab('login')}>Sign in</button><button className={authTab === 'register' ? 'selected' : ''} onClick={() => setAuthTab('register')}>Create account</button></div><form className="auth-form" onSubmit={onSubmit}>{authTab === 'register' && <label>Full name<input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name"/></label>}<label>Email address<input type="email" autoComplete="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="you@company.com"/></label><label>Password<input type="password" minLength="8" autoComplete={authTab === 'register' ? 'new-password' : 'current-password'} required value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="At least 8 characters"/></label><button className="coral-button full" disabled={busy}>{busy ? 'Please wait...' : authTab === 'register' ? 'Create account' : 'Sign in'}<ArrowRight size={17}/></button></form><div className="auth-divider"><span/>or continue with<span/></div><button className="google-button" onClick={onGoogle}><GoogleMark/>Continue with Google</button><div className="mock-divider"><span/>DEVELOPMENT ACCESS<span/></div><button className="mock-button" onClick={onMock} disabled={busy}><Database size={17}/> Enter mock database <ArrowUpRight size={15}/></button><p className="mock-explain instruction-note">Uses sample workspace data. Login and GitHub integration are skipped and no real repositories are accessed.</p>{notice && <div className="login-alert"><AlertTriangle size={15}/>{notice}</div>}<div className="login-privacy instruction-note"><LockKeyhole size={13}/> Your account's project memory stays scoped to your account.</div></div><div className="login-footer">NEXORA <span>© 2026</span></div></div></div>;
+  return <main className="login-screen login-experience">
+    <header className="login-topbar">
+      <a className="login-top-brand" href="#top" aria-label="NEXORA home">
+        <img src="/brand/nexora-mark.png" alt=""/>
+        <img className="login-top-wordmark" src="/brand/nexora-wordmark.png" alt="NEXORA"/>
+      </a>
+      <nav className="login-nav" aria-label="Main navigation">
+        <a href="#explore">Explore</a><a href="#projects">Projects</a><a href="#community">Community</a><a href="#about">About</a>
+      </nav>
+      <button className="login-signup-link" onClick={() => setAuthTab('register')}><Sparkles size={15}/> Sign Up</button>
+    </header>
+
+    <div className="login-landscape" aria-hidden="true">
+      <div className="landscape-moon"/><div className="landscape-ruins ruins-left"/><div className="landscape-ruins ruins-right"/>
+      <div className="landscape-ground"/><div className="landscape-orbit orbit-one"/><div className="landscape-orbit orbit-two"/>
+      <span className="landscape-star star-one"/><span className="landscape-star star-two"/><span className="landscape-star star-three"/>
+    </div>
+
+    <section className="login-showcase" id="explore">
+      <div className="showcase-kicker"><span/> PROJECTS, REIMAGINED</div>
+      <h1>NEXORA</h1>
+      <h2>Where <em>ideas evolve.</em></h2>
+      <p className="showcase-lead">Discover. Revive. Create.</p>
+      <p className="showcase-description">Bring forgotten projects back to life and turn the next idea into something real.</p>
+      <ul className="showcase-points">
+        <li><Code2/><span>Explore lost projects</span></li>
+        <li><RefreshCw/><span>Bring ideas back to life</span></li>
+        <li><Rocket/><span>Build what’s next</span></li>
+      </ul>
+    </section>
+
+    <section className="login-panel-wrap" id="login" aria-label={authTab === 'register' ? 'Create account' : 'Sign in'}>
+      <div className="login-card">
+        <div className="login-card-mark"><img src="/brand/nexora-mark.png" alt="NEXORA logo"/><span className="mark-orbit orbit-a"/><span className="mark-orbit orbit-b"/></div>
+        <div className="login-intro">
+          <div className="eyebrow">YOUR NEXT CHAPTER STARTS HERE</div>
+          <h2>{authTab === 'register' ? <>Join NEXORA, <em>Creator</em></> : <>Welcome Back, <em>Creator</em></>}</h2>
+          <p>{authTab === 'register' ? 'Create an account and bring your ideas with you.' : 'Enter your credentials to continue'}</p>
+        </div>
+        <div className="auth-tabs" role="tablist" aria-label="Account access">
+          <button type="button" role="tab" aria-selected={authTab === 'login'} className={authTab === 'login' ? 'selected' : ''} onClick={() => setAuthTab('login')}>Sign in</button>
+          <button type="button" role="tab" aria-selected={authTab === 'register'} className={authTab === 'register' ? 'selected' : ''} onClick={() => setAuthTab('register')}>Create account</button>
+        </div>
+        <form className="auth-form" onSubmit={onSubmit}>
+          {authTab === 'register' && <label>Full name<input required autoComplete="name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name"/></label>}
+          <label><span>Email address</span><span className="auth-input-wrap"><Activity size={17}/><input type="email" autoComplete="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Enter your email address"/></span></label>
+          <label><span>Password</span><span className="auth-input-wrap"><LockKeyhole size={17}/><input type="password" minLength="8" autoComplete={authTab === 'register' ? 'new-password' : 'current-password'} required value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Enter your password"/></span></label>
+          <button className="coral-button full login-submit" disabled={busy}>{busy ? 'Please wait...' : authTab === 'register' ? 'CREATE ACCOUNT' : 'ENTER NEXORA'}<ArrowUpRight size={18}/></button>
+        </form>
+        <div className="login-social-divider"><span/>OR<span/></div>
+        <button className="google-button login-google" onClick={onGoogle}><GoogleMark/><span>Continue with Google</span></button>
+        {notice && <div className="login-alert"><AlertTriangle size={15}/>{notice}</div>}
+        <button className="mock-button login-demo" onClick={onMock} disabled={busy}><Database size={16}/> Explore the demo workspace</button>
+        <div className="login-privacy"><LockKeyhole size={13}/> Your project memory stays private to your account.</div>
+      </div>
+    </section>
+
+    <aside className="login-insights" aria-label="NEXORA project highlights">
+      <article className="insight-card insight-code"><div className="insight-code-top"><span/> PROJECT RESTORED <small>•••</small></div><code><b>&gt;</b> revive_project()<br/><b>&gt;</b> success!<br/><span>A new chapter begins...</span></code></article>
+      <article className="insight-card insight-community"><div className="insight-icon"><Users size={21}/></div><div><small>BUILD TOGETHER</small><p>Bring your next idea to a community of creators.</p></div><span className="community-nodes"><i/><i/><i/><i/></span></article>
+      <article className="insight-card insight-project"><div className="insight-icon"><FolderKanban size={20}/></div><div><small>PROJECT REVIVAL</small><p>Turn forgotten projects into something greater.</p></div><div className="project-art"><span/><i/><b/></div></article>
+    </aside>
+
+    <footer className="login-bottomline"><div><span className="bottom-live-dot"/> NEXORA <span className="bottom-version">v2.0</span><i/> Knowledge that moves forward</div><div className="bottom-note">BUILT FOR THE NEXT CHAPTER</div></footer>
+  </main>;
 }
 function GoogleMark(){return <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" transform="scale(.83) translate(5 5)"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.91c-.58 2.96-2.26 5.47-4.74 7.16l7.65 5.94c4.46-4.12 7.16-10.2 7.16-17.57z" transform="scale(.83) translate(5 5)"/><path fill="#FBBC05" d="M10.53 28.59a14.4 14.4 0 0 1-.76-4.59c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.89.94 7.57 2.56 10.78l7.97-6.19z" transform="scale(.83) translate(5 5)"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.88l-7.65-5.94c-2.13 1.43-4.86 2.28-8.25 2.28-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" transform="scale(.83) translate(5 5)"/></svg>}
 function PageHeading({ kicker, title, description, action }) { return <div className="page-heading"><div><div className="eyebrow">{kicker}</div><h1>{title}</h1><p>{description}</p></div>{action}</div>; }
@@ -334,3 +398,4 @@ function SettingsPage({ user, isMock, githubStatus, ai, storage, onConnect, onDi
 }
 
 createRoot(document.getElementById('root')).render(<App/>);
+
