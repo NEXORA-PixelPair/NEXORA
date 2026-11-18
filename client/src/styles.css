@@ -769,3 +769,6 @@ body{background:#001317;color:var(--offwhite)}
  .reference-login .login-bottomline{font-size:10px}
  .reference-login .bottom-socials{gap:12px}
 }
+
+.reference-login .reference-socials{gap:24px}
+.reference-login .bottom-socials{gap:24px}
