@@ -31,7 +31,9 @@ function App() {
   const [question, setQuestion] = useState('');
   const [chat, setChat] = useState([WELCOME_CHAT]);
   const [sources, setSources] = useState([]);
-  const [sourceForm, setSourceForm] = useState({ name: '', content: '' });
+  const [sourceForm, setSourceForm] = useState({ name: '', content: '', type: 'Project document' });
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [analysisBusy, setAnalysisBusy] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('nexora_theme') || 'dark');
   const [profileOpen, setProfileOpen] = useState(false);
@@ -49,7 +51,7 @@ function App() {
     setWorkspace(null); setUser(null); setMode('account'); setPage('Overview');
     setRepositoryList([]); setRepoSearch(''); setGithubStatus({ connected: false, login: null });
     setSelectedReport(null); setQuestion(''); setChat([WELCOME_CHAT]); setSources([]);
-    setSourceForm({ name: '', content: '' }); setProjectForm({ name: '', description: '' });
+    setSourceForm({ name: '', content: '', type: 'Project document' }); setAnalysisResult(null); setAnalysisBusy(false); setProjectForm({ name: '', description: '' });
     setAuthForm({ name: '', email: '', password: '' }); setAuthTab('login'); setBusy(false);
     setProfileOpen(false); setMobileNav(false);
   }
@@ -181,8 +183,20 @@ function App() {
   }
   async function addSource(event) {
     event.preventDefault(); setBusy(true);
-    try { await api('/sources', { method: 'POST', body: JSON.stringify(sourceForm) }); setSourceForm({ name: '', content: '' }); await refresh(); setPage('Knowledge memory'); setNotice('Knowledge source added to this account.'); }
+    try { await api('/sources', { method: 'POST', body: JSON.stringify(sourceForm) }); setSourceForm({ name: '', content: '', type: 'Project document' }); await refresh(); setPage('Knowledge memory'); setNotice('Knowledge source added to this account.'); }
     catch (error) { setNotice(error.message); } finally { setBusy(false); }
+  }
+
+  async function analyzeProject() {
+    const requestToken = token;
+    setAnalysisBusy(true);
+    try {
+      const result = await api('/ai/analyze', { method: 'POST', body: '{}' });
+      if (localStorage.getItem('nexora_token') !== requestToken) return;
+      setAnalysisResult(result);
+      setNotice(`Analysis complete using ${result.sourceCount} knowledge source(s) and ${result.repositoryReportCount} GitHub report(s).`);
+    } catch (error) { if (localStorage.getItem('nexora_token') === requestToken) setNotice(error.message); }
+    finally { if (localStorage.getItem('nexora_token') === requestToken) setAnalysisBusy(false); }
   }
 
   const intro = introVisible ? <PixelPairIntro onComplete={finishIntro}/> : null;
@@ -217,7 +231,7 @@ function App() {
         {page === 'Projects' && <ProjectsPage projects={projects} onCreate={createProject} form={projectForm} setForm={setProjectForm} busy={busy}/>}
         {page === 'Repositories' && !isMock && <RepositoriesPage connected={githubStatus.connected} login={githubStatus.login} repos={repositoryList} filtered={filteredRepos} search={repoSearch} setSearch={setRepoSearch} onConnect={startGithubConnect} onLoad={loadRepositories} onReport={generateReport} busy={busy}/>}
         {page === 'Pass-on reports' && <ReportsPage reports={reports} selected={selectedReport} onOpen={openReport} onClear={() => setSelectedReport(null)} onApprove={approveReport}/>}
-        {page === 'Knowledge memory' && <MemoryPage sources={sources} form={sourceForm} setForm={setSourceForm} onAdd={addSource} busy={busy} isMock={isMock}/>}
+        {page === 'Knowledge memory' && <MemoryPage sources={sources} form={sourceForm} setForm={setSourceForm} onAdd={addSource} busy={busy} isMock={isMock} analysis={analysisResult} analysisBusy={analysisBusy} onAnalyze={analyzeProject}/>}
         {page === 'Knowledge radar' && <RadarPage risks={risks} projects={projects} onScan={async()=>{try{const r=await api('/risks/scan',{method:'POST',body:'{}'}); await refresh();setNotice(`Scan complete. ${r.created} new signal(s) found.`)}catch(e){setNotice(e.message)}}}/>}
         {page === 'AI assistant' && <AssistantPage chat={chat} question={question} setQuestion={setQuestion} onSubmit={submitQuestion} isMock={isMock} configured={workspace.ai?.configured}/>}
         {page === 'Settings' && <SettingsPage user={user} isMock={isMock} githubStatus={githubStatus} ai={workspace.ai} storage={workspace.storage} onConnect={startGithubConnect} onDisconnect={async()=>{try{await api('/github/disconnect',{method:'POST',body:'{}'});setGithubStatus({connected:false});setRepositoryList([]);setNotice('GitHub disconnected.')}catch(e){setNotice(e.message)}}}/>}
@@ -387,8 +401,34 @@ function ReportContent({ report, createdAt }) {
   ];
   return <div className="report-document"><div className="report-document-head"><div className="eyebrow">GENERATED {createdAt ? new Date(createdAt).toLocaleString() : ''}</div><h2>{report.repository?.fullName || report.repository?.full_name || 'Repository handover'}</h2><p>{report.executiveSummary}</p><span className="report-provider">Analysis: {report.aiProvider || 'NEXORA'} · Confidence: {report.confidenceLevel || 'not assessed'}</span></div>{groups.map(([title, value]) => value && <section className="report-section" key={title}><h3>{title}</h3>{Array.isArray(value) ? <ul>{value.map((item, i) => <li key={i}>{typeof item === 'string' ? item : JSON.stringify(item)}</li>)}</ul> : <p>{value}</p>}</section>)}{report.riskSignals?.length > 0 && <section className="report-section"><h3>Actionable knowledge-risk signals</h3><div className="report-risk-grid">{report.riskSignals.map((risk, i) => <article className="report-risk-card" key={i}><div className="report-risk-top"><b>{risk.title}</b><span className={`risk-level ${risk.severity || 'medium'}`}/><small>{String(risk.severity || 'medium').toUpperCase()} · {(risk.category || 'other').replaceAll('_',' ')}</small></div><p>{risk.description}</p><p><strong>Recommended action:</strong> {risk.recommendedAction}</p>{risk.evidenceIds?.length > 0 && <small>Evidence: {risk.evidenceIds.join(', ')}</small>}</article>)}</div></section>}{report.coverageNotes?.length > 0 && <section className="report-section"><h3>Evidence coverage</h3><ul>{report.coverageNotes.map((item, i) => <li key={i}>{item}</li>)}</ul></section>}{report.sourceEvidence?.length > 0 && <section className="report-section"><h3>Source evidence</h3><div className="evidence-list">{report.sourceEvidence.map((item, i) => <div key={i}><b>{item.source}</b><p>{item.detail}</p>{item.url && <a className="evidence-link" href={item.url} target="_blank" rel="noreferrer">Open source <ArrowUpRight size={12}/></a>}</div>)}</div></section>}{report.aiGenerationError && <div className="report-limitation"><AlertTriangle size={17}/><p>{report.aiGenerationError}</p></div>}{report.reviewGuidance && <p className="form-note instruction-note">{report.reviewGuidance}</p>}{report.limitation && <div className="report-limitation"><AlertTriangle size={17}/><p>{report.limitation}</p></div>}</div>;
 }
-function MemoryPage({ sources, form, setForm, onAdd, busy, isMock }) {
-  return <><PageHeading kicker="PROJECT MEMORY ENGINE" title="Keep the context connected." description="Add the decisions, working notes and operational details that should remain available beyond a team transition."/><div className="memory-layout"><form className="memory-form" onSubmit={onAdd}><div className="eyebrow">ADD A KNOWLEDGE SOURCE</div><h2>Capture what matters.</h2><label>Source title<input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Deployment decisions"/></label><label>Project context<textarea required rows="8" value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder="Record a technical decision, dependency, unresolved question or important project context..."/></label><button className="coral-button" disabled={busy}>Save to project memory <ArrowRight size={16}/></button><p className="form-note instruction-note"><LockKeyhole size={13}/> Source content is scoped to this workspace account.</p></form><div className="memory-library"><div className="section-title-row"><div><div className="eyebrow">SOURCE LIBRARY</div><h2>{sources.length} saved sources</h2></div></div>{sources.map(source => <article className="source-card" key={source._id}><span className="teal-icon"><FileText size={18}/></span><div><b>{source.name}</b><p>{source.summary || source.content?.slice(0,180)}</p><small>{new Date(source.createdAt).toLocaleDateString()}</small></div></article>)}{!sources.length && <EmptyState icon={BookOpen} title="Your memory is ready for its first source" description={isMock ? 'Add sample notes here to explore how knowledge is collected.' : 'Start with setup instructions, a technical decision or a meeting summary.'}/>}</div></div></>;
+function MemoryPage({ sources, form, setForm, onAdd, busy, isMock, analysis, analysisBusy, onAnalyze }) {
+  const [fileNotice, setFileNotice] = useState('');
+  async function readSourceFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 500000) { setFileNotice('Please keep source files under 500 KB for this first version.'); event.target.value = ''; return; }
+    const extension = file.name.split('.').pop().toLowerCase();
+    if (!['txt','md','csv','json'].includes(extension)) { setFileNotice('For now, upload .txt, .md, .csv or .json exports. PDF/DOCX extraction is the next connector step.'); event.target.value = ''; return; }
+    try {
+      const content = await file.text();
+      setForm(previous => ({ ...previous, name: previous.name || file.name, content }));
+      setFileNotice(`Loaded ${file.name}. Review the extracted text, then save it to project memory.`);
+    } catch { setFileNotice('This file could not be read as text.'); }
+  }
+  const sections = [
+    ['Architecture findings', analysis?.report?.architectureFindings],
+    ['Key decisions', analysis?.report?.keyDecisions],
+    ['Tasks & delivery signals', analysis?.report?.taskAndDeliverySignals],
+    ['Meeting outcomes', analysis?.report?.meetingOutcomes],
+    ['Knowledge gaps', analysis?.report?.knowledgeGaps],
+    ['Recommended actions', analysis?.report?.recommendedActions]
+  ];
+  return <><PageHeading kicker="PROJECT INTELLIGENCE ENGINE" title="Connect the knowledge. Understand the project." description="Bring GitHub reports, project documents, task-board exports and meeting notes together. NEXORA looks for relationships, decisions, delivery signals and knowledge gaps between them." action={<button className="coral-button" onClick={onAnalyze} disabled={analysisBusy || (!sources.length && isMock)}><Sparkles size={17}/>{analysisBusy ? 'Analysing...' : 'Analyse project'}</button>}/>
+    <div className="intelligence-source-strip"><div><span className="teal-icon"><Github size={18}/></span><b>GitHub repositories</b><small>Connect in Repositories; saved pass-on reports are included automatically.</small></div><div><span className="teal-icon"><FileText size={18}/></span><b>Project documents</b><small>Upload text/Markdown exports or paste technical documentation.</small></div><div><span className="teal-icon"><LayoutDashboard size={18}/></span><b>Task boards</b><small>Add CSV exports with task names, owners, status and due dates.</small></div><div><span className="teal-icon"><Users size={18}/></span><b>Meeting notes</b><small>Save decisions, blockers, action items and meeting summaries.</small></div></div>
+    <div className="memory-layout"><form className="memory-form" onSubmit={onAdd}><div className="eyebrow">INGEST PROJECT KNOWLEDGE</div><h2>Add a source.</h2><label>Source type<select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}><option>Project document</option><option>Task board</option><option>Meeting notes</option><option>Text note</option></select></label><label>Source title<input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Sprint 4 task export"/></label><label className="source-file-label">Import text file<input type="file" accept=".txt,.md,.csv,.json,text/plain,text/markdown,text/csv,application/json" onChange={readSourceFile}/></label>{fileNotice && <p className="form-note">{fileNotice}</p>}<label>Source content<textarea required rows="9" value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder="Paste requirements, task rows, meeting notes, decisions or technical context..."/></label><button className="coral-button" disabled={busy}>Save source <ArrowRight size={16}/></button><p className="form-note instruction-note"><LockKeyhole size={13}/> Content is private to this workspace. Secrets are redacted before storage.</p></form>
+    <div className="memory-library"><div className="section-title-row"><div><div className="eyebrow">CONNECTED KNOWLEDGE</div><h2>{sources.length} saved sources</h2></div></div>{sources.map(source => <article className="source-card" key={source._id}><span className="teal-icon"><FileText size={18}/></span><div><b>{source.name}</b><p>{source.summary || source.content?.slice(0,180)}</p><small>{source.type || 'Project document'} · {new Date(source.createdAt).toLocaleDateString()}</small></div></article>)}{!sources.length && <EmptyState icon={BookOpen} title="Your project memory is empty" description={isMock ? 'Add demonstration notes to explore source ingestion.' : 'Connect GitHub and add a project document, task export or meeting note to get started.'}/>}
+    {analysis && <section className="analysis-result"><div className="analysis-result-head"><div><div className="eyebrow">CROSS-SOURCE ANALYSIS</div><h2>Project intelligence report</h2></div><span className="evidence-tag">{analysis.provider}</span></div><p className="analysis-overview">{analysis.report.projectOverview}</p><div className="analysis-meta">{analysis.sourceCount} uploaded source(s) · {analysis.repositoryReportCount} GitHub report(s) · {new Date(analysis.analysedAt).toLocaleString()}</div>{sections.map(([title, items]) => items?.length ? <div className="analysis-section" key={title}><h3>{title}</h3><ul>{items.map((item,index)=><li key={index}>{item}</li>)}</ul></div> : null)}{analysis.report.risks?.length>0 && <div className="analysis-section"><h3>Risk signals</h3>{analysis.report.risks.map((risk,index)=><article className="analysis-risk" key={index}><b><span className={`risk-level ${risk.severity}`}/>{risk.title}</b><p>{risk.detail}</p><small>Evidence: {risk.evidence}</small><p>Next: {risk.recommendedAction}</p></article>)}</div>}<div className="analysis-section"><h3>Evidence used</h3><ul>{analysis.report.evidenceUsed?.map((item,index)=><li key={index}>{item}</li>)}</ul><small>Confidence: {analysis.report.confidence}</small></div></section>}</div></div>
+  </>;
 }
 function RadarPage({ risks, projects, onScan }) {
   return <><PageHeading kicker="KNOWLEDGE LOSS RADAR" title="See the gaps before they grow." description="Spot projects with missing source material and keep unresolved context visible." action={<button className="coral-button" onClick={onScan}><Target size={17}/> Run knowledge scan</button>}/><div className="radar-intro"><div className="radar-number">{risks.length.toString().padStart(2,'0')}</div><div><h2>Open knowledge signals</h2><p>{risks.length ? 'These items deserve a review before a project changes hands.' : 'No open signals in this workspace. Run a scan after adding project sources.'}</p></div></div><div className="risk-list">{risks.map(risk => <article className="risk-card" key={risk._id}><span className={`risk-level ${risk.severity}`}/><div><h3>{risk.title}</h3><p>{risk.description}</p><small>{risk.severity || 'Review'} · {risk.projectId ? 'Project signal' : 'Workspace signal'}</small></div></article>)}{!risks.length && <EmptyState icon={ShieldCheck} title="No active knowledge gaps" description={`${projects.length} project(s) currently have no open signals in this workspace.`}/>}</div></>;
