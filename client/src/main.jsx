@@ -296,7 +296,7 @@ function PixelPairIntro({ onComplete }) {
 
 function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, onMock, busy, notice }) {
   const [showPassword, setShowPassword] = useState(false);
-  return <main className="login-screen login-experience">
+  return <main className="login-screen login-experience reference-login">
     <header className="login-topbar">
       <a className="login-top-brand" href="#top" aria-label="NEXORA home">
         <img src="/brand/nexora-mark.png" alt=""/>
@@ -305,25 +305,30 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
       <nav className="login-nav" aria-label="Main navigation">
         <a href="#explore">Explore</a><a href="#projects">Projects</a><a href="#community">Community</a><a href="#about">About</a>
       </nav>
-      <button className="login-signup-link" onClick={() => setAuthTab('register')}><Sparkles size={15}/> Sign Up</button>
+      <button type="button" className="login-signup-link" onClick={() => setAuthTab('register')}><Sparkles size={15}/> Sign Up</button>
     </header>
 
     <div className="login-landscape" aria-hidden="true">
-      <div className="landscape-moon"/><div className="landscape-ruins ruins-left"/><div className="landscape-ruins ruins-right"/>
-      <div className="landscape-ground"/><div className="landscape-orbit orbit-one"/><div className="landscape-orbit orbit-two"/>
+      <div className="landscape-moon"/>
+      <div className="landscape-ruins ruins-left"/>
+      <div className="landscape-ruins ruins-right"/>
+      <div className="graveyard-silhouettes"><i/><i/><i/><i/><i/><i/><i/></div>
+      <div className="landscape-ground"/>
+      <div className="landscape-orbit orbit-one"/><div className="landscape-orbit orbit-two"/>
       <span className="landscape-star star-one"/><span className="landscape-star star-two"/><span className="landscape-star star-three"/>
     </div>
 
     <section className="login-showcase" id="explore">
-      <div className="showcase-kicker"><span/> PROJECTS, REIMAGINED</div>
-      <h1>NEXORA</h1>
-      <h2>Where <em>ideas evolve.</em></h2>
+      <h1>NEX<span>O</span>RA</h1>
+      <h2>Where <em>Ideas Evolve</em></h2>
+      <div className="showcase-rule"/>
       <p className="showcase-lead">Discover. Revive. Create.</p>
-      <p className="showcase-description">Bring forgotten projects back to life and turn the next idea into something real.</p>
+      <p className="showcase-description">Your Projects. Reimagined.</p>
+      <div className="showcase-rule short"/>
       <ul className="showcase-points">
-        <li><Code2/><span>Explore lost projects</span></li>
-        <li><RefreshCw/><span>Bring ideas back to life</span></li>
-        <li><Rocket/><span>Build what’s next</span></li>
+        <li><Code2/><span>Explore Lost Projects</span></li>
+        <li><RefreshCw/><span>Bring Ideas Back to Life</span></li>
+        <li><Rocket/><span>Build What's Next</span></li>
       </ul>
     </section>
 
@@ -331,35 +336,37 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
       <div className="login-card">
         <div className="login-card-mark"><img src="/brand/nexora-mark.png" alt="NEXORA logo"/><span className="mark-orbit orbit-a"/><span className="mark-orbit orbit-b"/></div>
         <div className="login-intro">
-          <div className="eyebrow">YOUR NEXT CHAPTER STARTS HERE</div>
           <h2>{authTab === 'register' ? <>Join NEXORA, <em>Creator</em></> : <>Welcome Back, <em>Creator</em></>}</h2>
-          <p>{authTab === 'register' ? 'Create an account and bring your ideas with you.' : 'Enter your credentials to continue'}</p>
-        </div>
-        <div className="auth-tabs" role="tablist" aria-label="Account access">
-          <button type="button" role="tab" aria-selected={authTab === 'login'} className={authTab === 'login' ? 'selected' : ''} onClick={() => setAuthTab('login')}>Sign in</button>
-          <button type="button" role="tab" aria-selected={authTab === 'register'} className={authTab === 'register' ? 'selected' : ''} onClick={() => setAuthTab('register')}>Create account</button>
+          <p>{authTab === 'register' ? 'Create your account to continue' : 'Enter your credentials to continue'}</p>
         </div>
         <form className="auth-form" onSubmit={onSubmit}>
-          {authTab === 'register' && <label>Full name<input required autoComplete="name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name"/></label>}
-          <label><span>Email address</span><span className="auth-input-wrap"><Mail size={19}/><input type="email" autoComplete="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Enter your email address"/></span></label>
-          <label><span>Password</span><span className="auth-input-wrap"><LockKeyhole size={19}/><input type={showPassword ? "text" : "password"} minLength="8" autoComplete={authTab === 'register' ? 'new-password' : 'current-password'} required value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Enter your password"/><button type="button" className="password-visibility" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}</button></span></label>
-          <button className="coral-button full login-submit" disabled={busy}>{busy ? 'Please wait...' : authTab === 'register' ? 'CREATE ACCOUNT' : 'ENTER NEXORA'}<ArrowUpRight size={18}/></button>
+          {authTab === 'register' && <label className="reference-name-field"><input required autoComplete="name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter your full name"/></label>}
+          <label className="reference-field"><span className="auth-input-wrap"><Mail size={21}/><input type="email" autoComplete="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Enter your email address"/></span></label>
+          <label className="reference-field"><span className="auth-input-wrap"><LockKeyhole size={21}/><input type={showPassword ? "text" : "password"} minLength="8" autoComplete={authTab === 'register' ? 'new-password' : 'current-password'} required value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Enter your password"/><button type="button" className="password-visibility" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={19}/> : <Eye size={19}/>}</button></span></label>
+          <button className="coral-button full login-submit" disabled={busy}>{busy ? 'Please wait...' : authTab === 'register' ? 'CREATE ACCOUNT' : 'ENTER NEXORA'}<ArrowUpRight size={20}/></button>
         </form>
         <div className="login-social-divider"><span/>OR<span/></div>
-        <button className="google-button login-google" onClick={onGoogle}><GoogleMark/><span>Continue with Google</span></button>
+        <div className="reference-socials">
+          <a href="https://github.com/NEXORA-PixelPair/NEXORA" target="_blank" rel="noreferrer" aria-label="NEXORA on GitHub"><Github size={23}/></a>
+          <button type="button" onClick={onGoogle} aria-label="Continue with Google"><GoogleMark/></button>
+          <span aria-label="Discord community"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.7 5.3A18.7 18.7 0 0 0 15.1 4l-.6 1.2a17.2 17.2 0 0 0-5 0L8.9 4a18.7 18.7 0 0 0-4.6 1.3C1.4 9.5.6 13.6 1 17.7a18.8 18.8 0 0 0 5.7 2.9l1.2-2a12 12 0 0 1-1.9-.9l.5-.4a13.4 13.4 0 0 0 11 0l.5.4a12 12 0 0 1-1.9.9l1.2 2a18.8 18.8 0 0 0 5.7-2.9c.5-4.8-.8-8.9-3.3-12.4ZM8.8 14.8c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Zm6.4 0c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Z"/></svg></span>
+        </div>
         {notice && <div className="login-alert"><AlertTriangle size={15}/>{notice}</div>}
-        <button className="mock-button login-demo" onClick={onMock} disabled={busy}><Database size={16}/> Explore the demo workspace</button>
-        <div className="login-privacy"><LockKeyhole size={13}/> Your project memory stays private to your account.</div>
+        {authTab === 'login' && <div className="reference-forgot">Forgot your password?</div>}
+        {authTab === 'register' && <button type="button" className="reference-back-login" onClick={() => setAuthTab('login')}>Already have an account? Sign in</button>}
       </div>
     </section>
 
     <aside className="login-insights" aria-label="NEXORA project highlights">
-      <article className="insight-card insight-code"><div className="insight-code-top"><span/> PROJECT RESTORED <small>•••</small></div><code><b>&gt;</b> revive_project()<br/><b>&gt;</b> success!<br/><span>A new chapter begins...</span></code></article>
-      <article className="insight-card insight-community"><div className="insight-icon"><Users size={21}/></div><div><small>BUILD TOGETHER</small><p>Bring your next idea to a community of creators.</p></div><span className="community-nodes"><i/><i/><i/><i/></span></article>
-      <article className="insight-card insight-project"><div className="insight-icon"><FolderKanban size={20}/></div><div><small>PROJECT REVIVAL</small><p>Turn forgotten projects into something greater.</p></div><div className="project-art"><span/><i/><b/></div></article>
+      <article className="insight-card insight-code"><div className="insight-code-top"><span/> <small>⌘ ⋮ ×</small></div><code><b>&gt;</b> revive_project()<br/><b>&gt;</b> success!<br/><span>A new chapter begins...</span></code></article>
+      <article className="insight-card insight-community"><div className="insight-icon"><Users size={26}/></div><div><p>Join a thriving<br/>community of developers</p></div><span className="community-nodes"><i/><i/><i/><i/><b>+1k</b></span></article>
+      <article className="insight-card insight-project"><div className="insight-icon"><FolderKanban size={25}/></div><div><p>Turn forgotten projects<br/>into something greater.</p></div><div className="project-art"/></article>
     </aside>
 
-    <footer className="login-bottomline"><div><span className="bottom-live-dot"/> NEXORA <span className="bottom-version">v2.0</span><i/> Knowledge that moves forward</div><div className="bottom-note">BUILT FOR THE NEXT CHAPTER</div></footer>
+    <footer className="login-bottomline">
+      <div><span className="bottom-live-dot"/> <b>NEXORA</b> <span className="bottom-version">v1.0</span><i/> Open Source <i/> Built for Dreamers</div>
+      <div className="bottom-socials"><a href="https://github.com/NEXORA-PixelPair/NEXORA" target="_blank" rel="noreferrer" aria-label="GitHub"><Github/></a><span aria-label="Discord">◉</span><span aria-label="LinkedIn">in</span><span aria-label="X">𝕏</span></div>
+    </footer>
   </main>;
 }
 function GoogleMark(){return <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" transform="scale(.83) translate(5 5)"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.91c-.58 2.96-2.26 5.47-4.74 7.16l7.65 5.94c4.46-4.12 7.16-10.2 7.16-17.57z" transform="scale(.83) translate(5 5)"/><path fill="#FBBC05" d="M10.53 28.59a14.4 14.4 0 0 1-.76-4.59c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.89.94 7.57 2.56 10.78l7.97-6.19z" transform="scale(.83) translate(5 5)"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.88l-7.65-5.94c-2.13 1.43-4.86 2.28-8.25 2.28-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" transform="scale(.83) translate(5 5)"/></svg>}
