@@ -480,7 +480,68 @@ app.patch('/api/reports/:id/approve', auth, async (req, res) => {
   res.json(report);
 });
 app.get('/api/sources', auth, async (req, res) => res.json(await listOwned('sources', req.ownerId)));
-app.post('/api/sources', auth, async (req, res) => { const { name, content } = req.body || {}; if (!name || !content) return res.status(400).json({ message: 'Source name and content are required.' }); const source = await insertOwned('sources', req.ownerId, { name, content: String(content).slice(0, 50000), summary: String(content).slice(0, 240), type: 'Text note' }); res.status(201).json(source); });
+app.post('/api/sources', auth, async (req, res) => {
+  const { name, content, type = 'Project document', sourceUrl = '' } = req.body || {};
+  if (!name || !String(content || '').trim()) return res.status(400).json({ message: 'Source name and content are required.' });
+  const allowedTypes = ['Project document', 'Task board', 'Meeting notes', 'Text note'];
+  if (!allowedTypes.includes(type)) return res.status(400).json({ message: 'Choose a supported source type.' });
+  const safeContent = redactPotentialSecrets(String(content)).slice(0, 50000);
+  const source = await insertOwned('sources', req.ownerId, { name: String(name).slice(0, 160), content: safeContent, summary: safeContent.slice(0, 240), type, sourceUrl: String(sourceUrl || '').slice(0, 1000) });
+  res.status(201).json(source);
+});
+
+app.post('/api/ai/analyze', auth, async (req, res) => {
+  try {
+    const [allSources, reports] = await Promise.all([listOwned('sources', req.ownerId), listOwned('reports', req.ownerId)]);
+    const sourceRows = allSources.filter(item => item.type !== 'AI Analysis').slice(0, 12).map(item => ({
+      label: String(item.name || 'Untitled source'),
+      type: String(item.type || 'Project document'),
+      content: redactPotentialSecrets(String(item.content || item.summary || '')).slice(0, 6500)
+    })).filter(item => item.content.trim());
+    const latestReports = [...reports]
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+      .filter(item => item.report || item.summary)
+      .slice(0, 5)
+      .map(item => ({ label: item.title || item.repoFullName || 'GitHub repository report', type: 'GitHub repository', content: reportToReadableText(item.report || item.summary).slice(0, 8500) }));
+    const evidence = [...sourceRows, ...latestReports];
+    if (!evidence.length) return res.status(400).json({ message: 'Add project documents, task-board exports, meeting notes or generate a GitHub pass-on report before running analysis.' });
+
+    const schema = {
+      type: 'object', additionalProperties: false,
+      properties: {
+        projectOverview: { type: 'string' },
+        architectureFindings: { type: 'array', items: { type: 'string' } },
+        keyDecisions: { type: 'array', items: { type: 'string' } },
+        taskAndDeliverySignals: { type: 'array', items: { type: 'string' } },
+        meetingOutcomes: { type: 'array', items: { type: 'string' } },
+        risks: { type: 'array', items: { type: 'object', additionalProperties: false, properties: { severity: { type: 'string', enum: ['high','medium','low'] }, title: { type: 'string' }, detail: { type: 'string' }, evidence: { type: 'string' }, recommendedAction: { type: 'string' } }, required: ['severity','title','detail','evidence','recommendedAction'] } },
+        knowledgeGaps: { type: 'array', items: { type: 'string' } },
+        recommendedActions: { type: 'array', items: { type: 'string' } },
+        evidenceUsed: { type: 'array', items: { type: 'string' } },
+        confidence: { type: 'string' }
+      },
+      required: ['projectOverview','architectureFindings','keyDecisions','taskAndDeliverySignals','meetingOutcomes','risks','knowledgeGaps','recommendedActions','evidenceUsed','confidence']
+    };
+    const system = 'You are NEXORA Project Intelligence. Analyse only the supplied evidence from GitHub repository reports, project documents, task-board exports and meeting notes. Connect facts across sources when supported. Do not invent owners, dates, decisions, implementation status or dependencies. Mark missing/conflicting information as a knowledge gap. Every risk must cite the source name or say evidence is insufficient. Return concise, actionable structured findings.';
+    const userContent = evidence.map((item, index) => `SOURCE ${index + 1}: ${item.label} [${item.type}]\\n${item.content}`).join('\\n\\n---\\n\\n').slice(0, 42000);
+    const aiReport = await groqJson(system, userContent, 'nexora_project_intelligence', schema);
+    const report = aiReport || {
+      projectOverview: `Evidence snapshot contains ${sourceRows.length} uploaded knowledge source(s) and ${latestReports.length} GitHub report(s). Configure GROQ_API_KEY on the backend to enable cross-source AI reasoning.`,
+      architectureFindings: [],
+      keyDecisions: [],
+      taskAndDeliverySignals: [],
+      meetingOutcomes: [],
+      risks: [],
+      knowledgeGaps: ['AI synthesis is not configured; the evidence has been collected but not semantically analysed.'],
+      recommendedActions: ['Configure GROQ_API_KEY in the backend environment and run the analysis again.'],
+      evidenceUsed: evidence.map(item => `${item.label} (${item.type})`),
+      confidence: 'Not assessed — deterministic fallback only.'
+    };
+    res.json({ report, provider: aiReport ? 'Groq AI' : 'Evidence fallback', sourceCount: sourceRows.length, repositoryReportCount: latestReports.length, analysedAt: new Date().toISOString() });
+  } catch (error) {
+    res.status(error.status || 500).json({ message: error.message || 'Project intelligence analysis failed.' });
+  }
+});
 app.post('/api/risks/scan', auth, async (req, res) => {
   const [sources, projects, existing] = await Promise.all(['sources','projects','risks'].map(c => listOwned(c, req.ownerId)));
   const created = [];
