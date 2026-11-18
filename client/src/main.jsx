@@ -302,9 +302,6 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
         <img src="/brand/nexora-mark.png" alt=""/>
         <img className="login-top-wordmark" src="/brand/nexora-wordmark.png" alt="NEXORA"/>
       </a>
-      <nav className="login-nav" aria-label="Main navigation">
-        <a href="#explore">Explore</a><a href="#projects">Projects</a><a href="#community">Community</a><a href="#about">About</a>
-      </nav>
       <button type="button" className="login-signup-link" onClick={() => setAuthTab('register')}><Sparkles size={15}/> Sign Up</button>
     </header>
 
