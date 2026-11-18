@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  Activity, ArrowRight, ArrowUpRight, BookOpen, Bot, Check, ChevronRight, ChevronDown, CircleHelp,
+  Activity, ArrowRight, ArrowUpRight, Eye, EyeOff, Mail, BookOpen, Bot, Check, ChevronRight, ChevronDown, CircleHelp,
   Code2, Database, FileCheck2, FileText, FolderKanban, Github, Lightbulb, Rocket,
   LayoutDashboard, LockKeyhole, LogOut, Menu, Moon, Sun, Plus, RefreshCw, Search, Send,
   Settings, ShieldCheck, Sparkles, Target, Users, X, AlertTriangle
@@ -340,8 +340,8 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
         </div>
         <form className="auth-form" onSubmit={onSubmit}>
           {authTab === 'register' && <label>Full name<input required autoComplete="name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Your name"/></label>}
-          <label><span>Email address</span><span className="auth-input-wrap"><Activity size={17}/><input type="email" autoComplete="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Enter your email address"/></span></label>
-          <label><span>Password</span><span className="auth-input-wrap"><LockKeyhole size={17}/><input type="password" minLength="8" autoComplete={authTab === 'register' ? 'new-password' : 'current-password'} required value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Enter your password"/></span></label>
+          <label><span>Email address</span><span className="auth-input-wrap"><Mail size={19}/><input type="email" autoComplete="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Enter your email address"/></span></label>
+          <label><span>Password</span><span className="auth-input-wrap"><LockKeyhole size={19}/><input type={showPassword ? "text" : "password"} minLength="8" autoComplete={authTab === 'register' ? 'new-password' : 'current-password'} required value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="Enter your password"/><button type="button" className="password-visibility" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}</button></span></label>
           <button className="coral-button full login-submit" disabled={busy}>{busy ? 'Please wait...' : authTab === 'register' ? 'CREATE ACCOUNT' : 'ENTER NEXORA'}<ArrowUpRight size={18}/></button>
         </form>
         <div className="login-social-divider"><span/>OR<span/></div>
