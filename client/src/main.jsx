@@ -98,7 +98,7 @@ function App() {
       const sessionToken = localStorage.getItem('nexora_token');
       if (sessionToken) fetch(`${API}/github/repos`, { headers: { Authorization: `Bearer ${sessionToken}` } })
         .then(async response => { const result = await response.json(); if (!response.ok) throw new Error(result.message || 'Could not load repositories.'); return result; })
-        .then(result => { setRepositoryList(result.repositories || []); setGithubStatus({ connected: true, login: null }); setNotice(`${result.count || 0} repositories loaded from GitHub.`); })
+        .then(result => { setRepositoryList(result.repositories || []); setGithubStatus({ connected: true, login: null }); setNotice([`${result.count || 0} repositories loaded from GitHub.`, ...(result.warnings || [])].join(' ')); })
         .catch(error => setNotice(error.message));
     }
   }, []);
@@ -150,7 +150,7 @@ function App() {
   }
   async function loadRepositories() {
     const requestToken = token; setBusy(true);
-    try { const result = await api('/github/repos'); if (localStorage.getItem('nexora_token') !== requestToken) return; setRepositoryList(result.repositories || []); setNotice(`${result.count ?? result.repositories?.length ?? 0} accessible repositories loaded.`); }
+    try { const result = await api('/github/repos'); if (localStorage.getItem('nexora_token') !== requestToken) return; setRepositoryList(result.repositories || []); setNotice([`${result.count ?? result.repositories?.length ?? 0} accessible repositories loaded.`, ...(result.warnings || [])].join(' ')); }
     catch (error) { setNotice(error.message); } finally { setBusy(false); }
   }
   async function generateReport(fullName) {
