@@ -237,7 +237,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
 app.post('/api/github/connect/start', auth, realAccountOnly, async (req, res) => {
   if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) return res.status(503).json({ message: 'GitHub OAuth is not configured. Add GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET to server/.env.' });
   const state = createState({ provider: 'github', userId: req.ownerId });
-  const params = new URLSearchParams({ client_id: process.env.GITHUB_CLIENT_ID, redirect_uri: process.env.GITHUB_CALLBACK_URL || `http://localhost:${port}/api/github/callback`, scope: 'read:user user:email repo', state });
+  const params = new URLSearchParams({ client_id: process.env.GITHUB_CLIENT_ID, redirect_uri: process.env.GITHUB_CALLBACK_URL || `http://localhost:${port}/api/github/callback`, scope: 'read:user user:email read:org repo', state });
   res.json({ authorizationUrl: `https://github.com/login/oauth/authorize?${params}` });
 });
 app.get('/api/github/callback', async (req, res) => {
@@ -259,19 +259,44 @@ app.get('/api/github/status', auth, realAccountOnly, async (req, res) => {
 app.get('/api/github/repos', auth, realAccountOnly, async (req, res) => {
   try {
     const user = await findUserById(req.ownerId); const token = await getGithubToken(user);
-    const allRepos = []; let page = 1;
-    // GitHub returns at most 100 repositories per page. Continue until there are no more.
-    // This avoids silently hiding repositories for accounts with more than 1,000 accessible repositories.
-    while (true) {
-      const response = await githubFetch(`/user/repos?per_page=100&page=${page}&sort=updated&direction=desc&affiliation=owner%2Ccollaborator%2Corganization_member`, token);
-      const batch = await response.json();
-      if (!Array.isArray(batch) || batch.length === 0) break;
-      allRepos.push(...batch);
-      if (batch.length < 100) break;
-      page += 1;
+    const byId = new Map();
+    const warnings = [];
+    const collectPages = async (pathForPage) => {
+      for (let page = 1; ; page += 1) {
+        const response = await githubFetch(pathForPage(page), token);
+        const batch = await response.json();
+        if (!Array.isArray(batch) || batch.length === 0) break;
+        for (const repo of batch) byId.set(String(repo.id), repo);
+        if (batch.length < 100) break;
+      }
+    };
+
+    // First collect repositories GitHub explicitly associates with the authenticated user.
+    await collectPages(page => `/user/repos?per_page=100&page=${page}&sort=updated&direction=desc&affiliation=owner%2Ccollaborator%2Corganization_member`);
+
+    // Also enumerate organisations the user belongs to. This catches organisation-owned
+    // repositories that can be omitted from /user/repos when membership/OAuth grants differ.
+    try {
+      const orgsResponse = await githubFetch('/user/orgs?per_page=100', token);
+      const orgs = await orgsResponse.json();
+      for (const org of (Array.isArray(orgs) ? orgs : [])) {
+        try {
+          await collectPages(page => `/orgs/${encodeURIComponent(org.login)}/repos?type=all&per_page=100&page=${page}&sort=updated`);
+        } catch (error) {
+          warnings.push(`Could not list repositories for organization ${org.login}: ${error.message}`);
+        }
+      }
+    } catch (error) {
+      warnings.push(`Organization discovery was unavailable: ${error.message}. Reconnect GitHub and approve the read:org permission to include organisation repositories.`);
     }
-    res.json({ repositories: allRepos.map(r => ({ id: r.id, name: r.name, fullName: r.full_name, description: r.description, private: r.private, htmlUrl: r.html_url, language: r.language, stars: r.stargazers_count, forks: r.forks_count, updatedAt: r.updated_at, defaultBranch: r.default_branch, archived: r.archived })), count: allRepos.length, truncated: false });
-  } catch (error) { res.status(error.status || 400).json({ message: error.message }); }
+
+    const repositories = [...byId.values()]
+      .sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0))
+      .map(r => ({ id: r.id, name: r.name, fullName: r.full_name, description: r.description, private: r.private, htmlUrl: r.html_url, language: r.language, stars: r.stargazers_count, forks: r.forks_count, updatedAt: r.updated_at, defaultBranch: r.default_branch, archived: r.archived }));
+    res.json({ repositories, count: repositories.length, truncated: false, warnings });
+  } catch (error) {
+    res.status(error.status || 400).json({ message: error.message || 'GitHub could not return repositories. Reconnect GitHub and try again.' });
+  }
 });
 app.post('/api/github/disconnect', auth, realAccountOnly, async (req, res) => { await updateUser(req.ownerId, { githubLogin: null, githubTokenEncrypted: null, githubConnectedAt: null }); res.json({ ok: true }); });
 
