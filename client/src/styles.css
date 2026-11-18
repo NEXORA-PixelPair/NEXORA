@@ -620,3 +620,17 @@ body{background:#001317;color:var(--offwhite)}
 @media(max-width:520px){.login-experience{padding:0 15px}.login-topbar{height:64px}.login-top-brand>img:first-child{width:34px;height:32px}.login-top-wordmark{width:92px;height:28px}.login-signup-link{font-size:11px;padding:8px 11px}.login-signup-link svg{width:13px}.login-panel-wrap{min-height:calc(100vh - 112px);padding:16px 0}.login-card{padding:17px 18px 16px;border-radius:18px}.login-card-mark{height:67px;width:76px}.login-card-mark img{width:62px;height:62px}.login-card .login-intro .eyebrow{font-size:8px}.login-card .login-intro h2{font-size:23px}.login-card .auth-form{gap:9px}.login-card .auth-form label>input,.auth-input-wrap{height:42px}.login-bottomline{font-size:9px}.login-bottomline>div:first-child{gap:7px}.login-landscape{top:64px}.landscape-orbit.orbit-one{left:-15%;width:80%;opacity:.25}.landscape-orbit.orbit-two{display:none}}
 @media(max-height:760px) and (min-width:821px){.login-experience{grid-template-rows:66px minmax(0,1fr) 42px}.login-card{padding:12px 26px 12px}.login-card-mark{height:60px;margin-bottom:0}.login-card-mark img{width:57px;height:57px}.login-card .login-intro h2{margin:5px 0}.login-card .login-intro p{margin-bottom:9px}.login-card .auth-tabs{margin-bottom:8px}.login-card .auth-form{gap:7px}.auth-input-wrap{height:40px}.login-card .login-social-divider{margin:9px 0 6px}.login-card .login-google{height:34px}.login-card .login-demo{margin-top:5px}.login-insights{gap:12px}}
 
+
+
+/* Login form refinements: clear field icons, accessible password reveal and tighter reference proportions. */
+.login-card .auth-input-wrap{height:50px;border-radius:13px;padding:0 15px;gap:13px}
+.login-card .auth-input-wrap>svg{width:20px;height:20px;color:#d0e4e3}
+.login-card .auth-input-wrap input{font-size:14px}
+.login-card .auth-input-wrap input::placeholder{color:#80979b}
+.login-card .password-visibility{display:grid;place-items:center;flex:0 0 26px;width:26px;height:30px;padding:0;border:0;background:transparent;color:#b8d0d0;cursor:pointer}
+.login-card .password-visibility:hover{color:#62fff1}
+.login-card .login-submit{height:54px;font-size:14px;border-radius:13px}
+.login-card .login-google{height:42px;font-size:12px}
+.login-card .login-intro h2{font-size:clamp(22px,2.2vw,28px)}
+.login-card .login-intro p{font-size:14px}
+@media(max-width:520px){.login-card .auth-input-wrap{height:46px}.login-card .login-submit{height:49px}}
