@@ -349,7 +349,6 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
         <div className="reference-socials">
           <a href="https://github.com/NEXORA-PixelPair/NEXORA" target="_blank" rel="noreferrer" aria-label="NEXORA on GitHub"><Github size={23}/></a>
           <button type="button" onClick={onGoogle} aria-label="Continue with Google"><GoogleMark/></button>
-          <span aria-label="Discord community"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.7 5.3A18.7 18.7 0 0 0 15.1 4l-.6 1.2a17.2 17.2 0 0 0-5 0L8.9 4a18.7 18.7 0 0 0-4.6 1.3C1.4 9.5.6 13.6 1 17.7a18.8 18.8 0 0 0 5.7 2.9l1.2-2a12 12 0 0 1-1.9-.9l.5-.4a13.4 13.4 0 0 0 11 0l.5.4a12 12 0 0 1-1.9.9l1.2 2a18.8 18.8 0 0 0 5.7-2.9c.5-4.8-.8-8.9-3.3-12.4ZM8.8 14.8c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Zm6.4 0c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Z"/></svg></span>
         </div>
         {notice && <div className="login-alert"><AlertTriangle size={15}/>{notice}</div>}
         {authTab === 'login' && <div className="reference-forgot">Forgot your password?</div>}
@@ -365,7 +364,7 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
 
     <footer className="login-bottomline">
       <div><span className="bottom-live-dot"/> <b>NEXORA</b> <span className="bottom-version">v1.0</span><i/> Open Source <i/> Built for Dreamers</div>
-      <div className="bottom-socials"><a href="https://github.com/NEXORA-PixelPair/NEXORA" target="_blank" rel="noreferrer" aria-label="GitHub"><Github/></a><span aria-label="Discord">◉</span><span aria-label="LinkedIn">in</span><span aria-label="X">𝕏</span></div>
+      <div className="bottom-socials"><a href="https://github.com/NEXORA-PixelPair/NEXORA" target="_blank" rel="noreferrer" aria-label="GitHub"><Github/></a><span aria-label="LinkedIn">in</span><span aria-label="X">𝕏</span></div>
     </footer>
   </main>;
 }
