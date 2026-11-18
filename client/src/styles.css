@@ -775,7 +775,7 @@ body{background:#001317;color:var(--offwhite)}
 
 
 /* Full NEXORA illustrated artwork behind the interactive sign-in panel.
-   Add the supplied asset at client/public/nexora-login-background.jpg. */
+   Add the supplied asset at client/public/nexora-login-background.png. */
 .reference-login{
   position:relative;
   display:grid;
@@ -786,7 +786,7 @@ body{background:#001317;color:var(--offwhite)}
   grid-template-rows:1fr;
   place-items:center;
   padding:24px;
-  background:#000b10 url('/nexora-login-background.jpg') center center / cover no-repeat;
+  background:#000b10 url('/nexora-login-background.png') center center / cover no-repeat;
 }
 .reference-login>.login-topbar,
 .reference-login>.login-landscape,
