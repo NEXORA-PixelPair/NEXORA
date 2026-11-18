@@ -274,20 +274,33 @@ app.get('/api/github/repos', auth, realAccountOnly, async (req, res) => {
     // First collect repositories GitHub explicitly associates with the authenticated user.
     await collectPages(page => `/user/repos?per_page=100&page=${page}&sort=updated&direction=desc&affiliation=owner%2Ccollaborator%2Corganization_member`);
 
-    // Also enumerate organisations the user belongs to. This catches organisation-owned
-    // repositories that can be omitted from /user/repos when membership/OAuth grants differ.
+    // Enumerate active organisation memberships (not only public memberships).
+    // /user/orgs can omit organisations whose membership is private.
+    let orgs = [];
     try {
-      const orgsResponse = await githubFetch('/user/orgs?per_page=100', token);
-      const orgs = await orgsResponse.json();
-      for (const org of (Array.isArray(orgs) ? orgs : [])) {
-        try {
-          await collectPages(page => `/orgs/${encodeURIComponent(org.login)}/repos?type=all&per_page=100&page=${page}&sort=updated`);
-        } catch (error) {
-          warnings.push(`Could not list repositories for organization ${org.login}: ${error.message}`);
-        }
-      }
+      const membershipsResponse = await githubFetch('/user/memberships/orgs?state=active&per_page=100', token);
+      const memberships = await membershipsResponse.json();
+      orgs = Array.isArray(memberships) ? memberships.map(item => item.organization).filter(Boolean) : [];
     } catch (error) {
-      warnings.push(`Organization discovery was unavailable: ${error.message}. Reconnect GitHub and approve the read:org permission to include organisation repositories.`);
+      warnings.push(`Could not read organisation memberships: ${error.message}. Reconnect GitHub and approve the read:org permission.`);
+    }
+
+    // Also include public memberships as a fallback, then de-duplicate organisations.
+    try {
+      const publicOrgsResponse = await githubFetch('/user/orgs?per_page=100', token);
+      const publicOrgs = await publicOrgsResponse.json();
+      if (Array.isArray(publicOrgs)) orgs.push(...publicOrgs);
+    } catch (error) {
+      warnings.push(`Public organisation discovery was unavailable: ${error.message}`);
+    }
+
+    const uniqueOrgs = [...new Map(orgs.filter(org => org?.login).map(org => [org.login.toLowerCase(), org])).values()];
+    for (const org of uniqueOrgs) {
+      try {
+        await collectPages(page => `/orgs/${encodeURIComponent(org.login)}/repos?type=all&per_page=100&page=${page}&sort=updated`);
+      } catch (error) {
+        warnings.push(`Could not list repositories for organization ${org.login}: ${error.message}`);
+      }
     }
 
     const repositories = [...byId.values()]
