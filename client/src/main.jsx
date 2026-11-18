@@ -295,6 +295,7 @@ function PixelPairIntro({ onComplete }) {
 }
 
 function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, onMock, busy, notice }) {
+  const [showPassword, setShowPassword] = useState(false);
   return <main className="login-screen login-experience">
     <header className="login-topbar">
       <a className="login-top-brand" href="#top" aria-label="NEXORA home">
