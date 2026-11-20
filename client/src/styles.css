@@ -1593,3 +1593,11 @@ h1,h2,h3,h4,.page-heading h1,.banner-copy h2,.brand-wordmark,.sidebar{font-famil
 .sidebar .workspace-avatar{width:48px!important;height:48px!important;min-width:48px!important;border-radius:14px!important;font-size:20px!important;background:linear-gradient(145deg,#1bc5bb,#147da1)!important;box-shadow:0 0 0 1px rgba(140,255,245,.3),0 6px 14px rgba(0,0,0,.2)!important;}
 .sidebar .workspace-tag b{font-family:'Outfit',sans-serif!important;font-size:16px!important;font-weight:800!important;letter-spacing:-.025em!important;color:#f7ffff!important;line-height:1.2!important;}
 .sidebar .workspace-tag small{font-family:'Plus Jakarta Sans',sans-serif!important;font-size:12px!important;font-weight:600!important;letter-spacing:.01em!important;color:#c2e9f2!important;line-height:1.4!important;margin-top:5px!important;}
+
+
+/* Landing intro: soft floating particle backdrop */
+.pixel-intro{isolation:isolate;overflow:hidden;}
+.pixel-intro:after{content:'';position:absolute;inset:-12%;z-index:0;pointer-events:none;background-image:radial-gradient(circle,rgba(190,230,255,.65) 1px,transparent 2px),radial-gradient(circle,rgba(130,220,255,.4) 1px,transparent 2px),radial-gradient(circle,rgba(210,170,255,.45) 1px,transparent 2px);background-size:83px 83px,127px 127px,173px 173px;background-position:0 0,33px 45px,80px 18px;opacity:.45;animation:landingParticlesFloat 32s linear infinite;}
+.pixel-intro .pixel-intro-content,.pixel-intro .pixel-intro-phases,.pixel-intro .pixel-ribbon-track,.pixel-intro .pixel-intro-progress,.pixel-intro .pixel-intro-skip{position:relative;z-index:2;}
+@keyframes landingParticlesFloat{0%{transform:translate3d(0,0,0) rotate(0deg)}50%{transform:translate3d(-24px,-35px,0) rotate(2deg)}100%{transform:translate3d(0,-75px,0) rotate(0deg)}}
+@media(prefers-reduced-motion:reduce){.pixel-intro:after{animation:none!important}}
