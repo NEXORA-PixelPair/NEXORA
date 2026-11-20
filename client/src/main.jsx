@@ -40,6 +40,8 @@ function App() {
   const [reconstruction, setReconstruction] = useState(null);
   const [reconstructionBusy, setReconstructionBusy] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [commandQuery, setCommandQuery] = useState('');
   const [theme, setTheme] = useState(() => localStorage.getItem('nexora_theme') || 'dark');
   const [profileOpen, setProfileOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -115,6 +117,11 @@ function App() {
         .catch(error => setNotice(error.message));
     }
   }, []);
+  useEffect(() => {
+    const handleShortcut = (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setCommandOpen(v => !v); setCommandQuery(''); } if (e.key === 'Escape') setCommandOpen(false); };
+    window.addEventListener('keydown', handleShortcut); return () => window.removeEventListener('keydown', handleShortcut);
+  }, []);
+
   useEffect(() => {
     const frame = document.querySelector('.app-frame');
     if (!frame) return;
@@ -337,6 +344,7 @@ function App() {
   const filteredRepos = repositoryList.filter(repo => `${repo.fullName} ${repo.description || ''} ${repo.language || ''}`.toLowerCase().includes(repoSearch.toLowerCase()));
 
   return <><div className="app-frame"><div className="ambient-effects" aria-hidden="true"><span className="shooting-star star-a"/><span className="shooting-star star-b"/><span className="shooting-star star-c"/></div>
+{commandOpen && <div className="command-overlay" onClick={() => setCommandOpen(false)}><section className="command-palette" onClick={e => e.stopPropagation()}><div className="command-search"><Search size={19}/><input autoFocus value={commandQuery} onChange={e => setCommandQuery(e.target.value)} placeholder="Search pages and actions…"/><kbd>ESC</kbd></div><div className="command-results"><div className="command-caption">NAVIGATION</div>{navigation.filter(item => item.label.toLowerCase().includes(commandQuery.toLowerCase())).map(item => <button key={item.label} onClick={() => {setPage(item.label);setMobileNav(false);setCommandOpen(false)}}><item.icon size={18}/><span>{item.label}</span><kbd>↵</kbd></button>)}<div className="command-caption">QUICK ACTIONS</div>{[{label:'Refresh workspace',icon:RefreshCw,action:()=>refresh()},{label:'Open NEXORA AI',icon:Bot,action:()=>setFloatingBotOpen(true)},{label:'Toggle theme',icon:Sun,action:()=>{const next=theme==='dark'?'light':'dark';setTheme(next);localStorage.setItem('nexora_theme',next)}}].filter(x=>x.label.toLowerCase().includes(commandQuery.toLowerCase())).map(x=><button key={x.label} onClick={()=>{x.action();setCommandOpen(false)}}><x.icon size={18}/><span>{x.label}</span><kbd>↵</kbd></button>)}</div><footer><span>Ctrl/⌘ K</span><span>Enter Select</span><span>Esc Close</span></footer></section></div>}
     <aside className={`sidebar ${mobileNav ? 'sidebar-open' : ''}`}>
       <div className="brand-row"><div className="sidebar-brand-lockup"><img src="/brand/nexora-mark.png" alt=""/><strong>NEXORA</strong></div><button className="icon-button sidebar-close" onClick={() => setMobileNav(false)}><X size={18}/></button></div>
       <div className="workspace-tag"><span className="workspace-avatar">{(user?.name || 'N').slice(0,1).toUpperCase()}</span><div><b>{isMock ? 'Demo workspace' : user?.name}</b><small>{isMock ? 'Mock database' : 'Private account space'}</small></div></div>
