@@ -340,7 +340,7 @@ function App() {
     { label: 'Projects', icon: FolderKanban, group: 'Workspace' },
     ...(!isMock ? [{ label: 'Repositories', icon: Github, group: 'Workspace' }] : []),
     { label: 'Pass-on reports', icon: FileCheck2, group: 'Workspace' },
-    { label: 'Notifications', icon: Bell, group: 'Workspace' },
+    { label: 'Notifications', icon: Bell, group: 'Workspace' },\n    { label: 'AI Assistant', icon: Bot, group: 'Intelligence' },
     { label: 'Project intelligence', icon: BookOpen, group: 'Intelligence' },
     { label: 'Knowledge radar', icon: Target, group: 'Intelligence' },
     { label: 'Settings', icon: Settings, group: 'Manage' }
@@ -363,6 +363,7 @@ function App() {
         {page === 'Projects' && <ProjectsPage projects={projects} onCreate={createProject} form={projectForm} setForm={setProjectForm} busy={busy}/>}
         {page === 'Repositories' && !isMock && <RepositoriesPage connected={githubStatus.connected} login={githubStatus.login} repos={repositoryList} filtered={filteredRepos} search={repoSearch} setSearch={setRepoSearch} onConnect={startGithubConnect} onLoad={loadRepositories} onReport={generateReport} onBulkReport={bulkGenerateReports} selection={managedRepoSelection} setSelection={setManagedRepoSelection} transferRequests={handoverRequests} busy={busy} notice={notice}/>}
         {page === 'Pass-on reports' && <ReportsPage reports={reports} selected={selectedReport} onOpen={openReport} onClear={() => setSelectedReport(null)} onApprove={approveReport}/>}
+        {page === 'AI Assistant' && <AssistantPage chat={chat} question={question} setQuestion={setQuestion} onSubmit={submitQuestion} isMock={isMock} configured={workspace.ai?.configured} chatTyping={chatTyping} voiceListening={voiceListening} onVoice={startVoiceInput}/>}
         {page === 'Project intelligence' && <MemoryPage sources={sources} reports={reports} form={sourceForm} setForm={setSourceForm} onAdd={addSource} busy={busy} isMock={isMock} analysis={analysisResult} analysisBusy={analysisBusy} onAnalyze={analyzeProject} reconstruction={reconstruction} reconstructionBusy={reconstructionBusy} onReconstruct={reconstructProject}/>}
         {page === 'Knowledge radar' && <RadarPage risks={risks} projects={projects} onScan={async()=>{try{const r=await api('/risks/scan',{method:'POST',body:'{}'}); await refresh();setNotice(`Scan complete. ${r.created} new signal(s) found.`)}catch(e){setNotice(e.message)}}}/>}
         {page === 'Settings' && <SettingsPage user={user} isMock={isMock} githubStatus={githubStatus} ai={workspace.ai} storage={workspace.storage} onConnect={startGithubConnect} onDisconnect={async()=>{try{await api('/github/disconnect',{method:'POST',body:'{}'});setGithubStatus({connected:false});setRepositoryList([]);setNotice('GitHub disconnected.')}catch(e){setNotice(e.message)}}}/>}
