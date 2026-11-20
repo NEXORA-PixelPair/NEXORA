@@ -114,6 +114,21 @@ function App() {
     }
   }, []);
   useEffect(() => {
+    const frame = document.querySelector('.app-frame');
+    if (!frame) return;
+    const move = event => {
+      const x = event.clientX / window.innerWidth;
+      const y = event.clientY / window.innerHeight;
+      frame.style.setProperty('--mouse-x', (x * 100) + '%');
+      frame.style.setProperty('--mouse-y', (y * 100) + '%');
+      frame.style.setProperty('--parallax-x', ((x - .5) * 16) + 'px');
+      frame.style.setProperty('--parallax-y', ((y - .5) * 12) + 'px');
+    };
+    window.addEventListener('mousemove', move, { passive: true });
+    return () => window.removeEventListener('mousemove', move);
+  }, [token, workspace, page]);
+
+  useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('nexora_theme', theme);
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#F2F5F2' : '#001317');
@@ -297,7 +312,7 @@ function App() {
   ];
   const filteredRepos = repositoryList.filter(repo => `${repo.fullName} ${repo.description || ''} ${repo.language || ''}`.toLowerCase().includes(repoSearch.toLowerCase()));
 
-  return <><div className="app-frame">
+  return <><div className="app-frame"><div className="ambient-effects" aria-hidden="true"><span className="shooting-star star-a"/><span className="shooting-star star-b"/><span className="shooting-star star-c"/></div>
     <aside className={`sidebar ${mobileNav ? 'sidebar-open' : ''}`}>
       <div className="brand-row"><div className="sidebar-brand-lockup"><img src="/brand/nexora-mark.png" alt=""/><strong>NEXORA</strong></div><button className="icon-button sidebar-close" onClick={() => setMobileNav(false)}><X size={18}/></button></div>
       <div className="workspace-tag"><span className="workspace-avatar">{(user?.name || 'N').slice(0,1).toUpperCase()}</span><div><b>{isMock ? 'Demo workspace' : user?.name}</b><small>{isMock ? 'Mock database' : 'Private account space'}</small></div></div>
