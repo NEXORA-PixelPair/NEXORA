@@ -1331,3 +1331,5 @@ button:not(:disabled):active{transform:scale(.98)}
 @keyframes bellShake{0%,100%{rotate:0deg}20%,60%{rotate:-12deg}40%,80%{rotate:12deg}}
 @keyframes projectStagger{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.ambient-effects:before,.ambient-effects:after,.shooting-star,.graphic-ring,.graphic-chip,.graphic-core,.stat-card .stat-value,.stat-card h2,.stat-card strong,.nav-group,.nav-link.active:after,.radar-intro:before,.radar-intro:after,.risk-level,.assistant-orb,.bot-avatar,.nexora-float-bot,.nexora-bot-orb:after,.nexora-bot-panel,.bot-mini-message.assistant,.bot-typing i,.settings-card-icon svg,.report-preview,.pass-on-report-card,.notification-card:hover .notification-bell,.project-card,.project-preview{animation:none!important;transition:none!important}}
+
+.notification-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sound-toggle{border-color:rgba(69,240,220,.32)!important;color:var(--overview-cyan,#45f0dc)!important}
