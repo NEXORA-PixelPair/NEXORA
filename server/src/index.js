@@ -863,7 +863,7 @@ app.post('/api/ai/ask', auth, async (req, res) => {
   const scoreEvidence = item => {
     const haystack = normaliseForSearch(`${item.label} ${item.text}`);
     const label = normaliseForSearch(item.label);
-    const hits = terms.filter(term => haystack.includes(` ${term} `) || haystack.includes(` ${term}s `) || haystack.includes(` ${term}ing `));
+    const hits = terms.filter(term => haystack.includes(` ${term} `) || haystack.includes(` ${term}s `) || haystack.includes(` ${term}ing `);
     const labelHits = terms.filter(term => label.includes(` ${term} `)).length;
     return { ...item, score: hits.length + labelHits * 2 };
   };
