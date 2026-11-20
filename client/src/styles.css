@@ -1094,3 +1094,27 @@ button:not(:disabled):active{transform:scale(.98)}
 @keyframes botPulse{0%,100%{box-shadow:0 0 0 1px rgba(80,203,184,.35),0 0 18px rgba(43,167,154,.18)}50%{box-shadow:0 0 0 6px rgba(80,203,184,.05),0 0 32px rgba(43,167,154,.38)}}
 @media(max-width:760px){.login-panel-wrap{padding:34px 22px 72px}.login-card{max-width:440px}.page-heading h1{font-size:clamp(30px,8vw,42px)}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Motion specifically for the first/landing screen: floating celestial scene */
+.login-landscape{z-index:0;overflow:hidden;isolation:isolate}
+.login-landscape:before,.login-landscape:after{content:'';position:absolute;inset:-20%;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(67,230,216,.17) 0 1px,transparent 2px);background-size:95px 95px;opacity:.45;animation:particleDrift 32s linear infinite}
+.login-landscape:after{background-size:137px 137px;opacity:.25;animation-duration:48s;animation-direction:reverse}
+.landscape-moon{animation:moonFloat 9s ease-in-out infinite,moonGlow 6s ease-in-out infinite alternate;transform-origin:center}
+.landscape-orbit{animation:orbitSpin 24s linear infinite;transform-origin:center}
+.orbit-two{animation-duration:36s;animation-direction:reverse}
+.landscape-star{animation:starTwinkle 2.8s ease-in-out infinite alternate;}
+.star-two{animation-delay:.8s}.star-three{animation-delay:1.5s}
+.landscape-ruins{animation:ruinsSway 12s ease-in-out infinite alternate}
+.ruins-right{animation-delay:-5s}
+.landscape-ground{animation:groundGlow 7s ease-in-out infinite alternate}
+.login-showcase h1,.login-showcase .showcase-kicker,.login-showcase p,.login-showcase>*{animation:showcaseLift .9s cubic-bezier(.2,.8,.2,1) both}
+.login-showcase>*:nth-child(2){animation-delay:.12s}.login-showcase>*:nth-child(3){animation-delay:.24s}.login-showcase>*:nth-child(4){animation-delay:.36s}
+@keyframes moonFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(14px,-18px,0)}}
+@keyframes moonGlow{from{filter:brightness(.95);box-shadow:inset -25px -7px 38px rgba(0,0,0,.6),0 0 45px rgba(0,205,211,.1)}to{filter:brightness(1.12);box-shadow:inset -25px -7px 38px rgba(0,0,0,.6),0 0 85px rgba(0,205,211,.25)}}
+@keyframes orbitSpin{from{rotate:0deg}to{rotate:360deg}}
+@keyframes starTwinkle{from{opacity:.35;scale:.65}to{opacity:1;scale:1.35}}
+@keyframes ruinsSway{from{transform:translateX(-5px)}to{transform:translateX(6px)}}
+@keyframes groundGlow{from{opacity:.55;filter:brightness(.95)}to{opacity:1;filter:brightness(1.16)}}
+@keyframes particleDrift{from{transform:translate3d(0,0,0) rotate(0)}to{transform:translate3d(-70px,-120px,0) rotate(12deg)}}
+@keyframes showcaseLift{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.landscape-moon,.landscape-orbit,.landscape-star,.landscape-ruins,.landscape-ground,.login-showcase>*{animation:none!important}}
