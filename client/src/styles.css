@@ -1434,3 +1434,17 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .project-preview{border:1px solid rgba(105,231,223,.28)!important;background:linear-gradient(145deg,rgba(24,40,65,.8),rgba(7,17,30,.8))!important;transition:transform .25s ease,border-color .25s ease}.project-preview:hover{transform:translateY(-4px);border-color:rgba(95,255,229,.65)!important}
 .sidebar{background:linear-gradient(180deg,rgba(1,18,27,.96),rgba(2,12,21,.98))!important;border-right:1px solid rgba(71,238,222,.18)!important}.workspace-tag{border:1px solid rgba(77,240,223,.38)!important;box-shadow:0 0 16px rgba(60,242,220,.16)!important}.nav-link.active{box-shadow:0 0 22px rgba(67,235,219,.28)!important}.topbar{backdrop-filter:blur(22px)!important;background:rgba(7,17,31,.64)!important;border-bottom:1px solid rgba(91,221,221,.15)!important}
 @media(prefers-reduced-motion:reduce){.app-frame:has(.welcome-block),.overview-banner:before,.overview-banner:after,.banner-copy h2 em,.graphic-core,.graphic-ring,.graphic-chip{animation:none!important}}
+
+/* Animated rainbow light bar on the left edge — premium reference effect */
+@keyframes nexoraRainbowFlow{0%{background-position:0% 0%;filter:hue-rotate(0deg)}50%{background-position:100% 100%;filter:hue-rotate(35deg)}100%{background-position:0% 0%;filter:hue-rotate(0deg)}}
+@keyframes nexoraRainbowBeam{0%,100%{opacity:.45;transform:translateY(-15%) scaleY(.75)}50%{opacity:1;transform:translateY(12%) scaleY(1.15)}}
+@keyframes nexoraRainbowSweep{0%{background-position:0% 50%;opacity:.55}50%{background-position:100% 50%;opacity:1}100%{background-position:0% 50%;opacity:.55}}
+.sidebar{position:relative;isolation:isolate}
+.sidebar:before{content:"";position:absolute;z-index:5;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180,#ff4f9a,#ffb84d,#f8ff62,#43ffd2,#56a7ff,#b76bff,#ff4f9a);background-size:100% 300%;animation:nexoraRainbowFlow 7s ease-in-out infinite;box-shadow:0 0 8px #4fffd2,0 0 18px rgba(187,99,255,.6),0 0 32px rgba(255,75,150,.28);pointer-events:none}
+.sidebar:after{content:"";position:absolute;z-index:4;left:-1px;top:12%;height:36%;width:5px;background:linear-gradient(180,transparent,#fff,#7ffff0,transparent);filter:blur(3px);animation:nexoraRainbowBeam 5s ease-in-out infinite;pointer-events:none}
+.sidebar-brand-lockup:after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:2px;background:linear-gradient(90deg,#ff63b8,#ffd56c,#5effd5,#6caaff,#b876ff,#ff63b8);background-size:200% 100%;animation:nexoraRainbowSweep 5s linear infinite;opacity:.8}
+.sidebar-brand-lockup{position:relative}
+.nav-link.active{position:relative;overflow:hidden}
+.nav-link.active:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,rgba(255,92,177,.16),rgba(255,213,98,.12),rgba(80,255,218,.18),rgba(112,154,255,.18),rgba(190,110,255,.16));background-size:250% 100%;animation:nexoraRainbowSweep 5s linear infinite}
+.nav-link.active:after{content:"";position:absolute;left:0;top:5px;bottom:5px;width:2px;border-radius:3px;background:linear-gradient(180,#ff5fb8,#ffd66a,#54ffdb,#75aaff,#c178ff);box-shadow:0 0 9px #55ffe0,0 0 15px #b778ff}
+@media(prefers-reduced-motion:reduce){.sidebar:before,.sidebar:after,.sidebar-brand-lockup:after,.nav-link.active:before{animation:none!important}}
