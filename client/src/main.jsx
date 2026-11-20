@@ -101,6 +101,16 @@ function App() {
     setSources(src);
   }
   useEffect(() => {
+    if (!token || !workspace || !user) return;
+    const identity=user.id||user._id||user.email||'account';
+    if(!localStorage.getItem('nexora_tour_seen_'+identity))setTourOpen(true);
+    const saved=localStorage.getItem('nexora_chat_history_'+identity);
+    if(saved){try{const parsed=JSON.parse(saved);if(Array.isArray(parsed)&&parsed.length)setChat(parsed);}catch{}}
+  },[token,workspace,user]);
+  useEffect(()=>{if(user)localStorage.setItem('nexora_chat_history_'+(user.id||user._id||user.email||'account'),JSON.stringify(chat.slice(-80)));},[chat,user]);
+  function closeTour(){localStorage.setItem('nexora_tour_seen_'+(user?.id||user?._id||user?.email||'account'),'1');setTourOpen(false);}
+  function startVoiceInput(){const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){setNotice('Voice input not supported. Use Chrome or Edge.');return;}try{const r=new Speech();speechRef.current=r;r.lang='en-US';r.interimResults=true;r.continuous=false;r.onstart=()=>setVoiceListening(true);r.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;setQuestion(t);};r.onerror=e=>{setNotice('Voice input error: '+e.error);setVoiceListening(false);};r.onend=()=>setVoiceListening(false);r.start();}catch{setNotice('Mic blocked. Allow microphone permission.');setVoiceListening(false);}}
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const loginCode = params.get('code');
     if (window.location.pathname === '/auth/complete' && loginCode) {
