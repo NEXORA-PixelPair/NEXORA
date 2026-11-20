@@ -1479,3 +1479,22 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .nav-caption{transition:color .2s ease}
 .nav-group:hover .nav-caption{color:#a4f7e9}
 @media(prefers-reduced-motion:reduce){.nav-link,.nav-link svg,.nav-link.active:after{transition:none!important;animation:none!important}}
+
+/* Live animated dashboard stats */
+@keyframes nexoraStatRise{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes nexoraChartDraw{from{stroke-dashoffset:650}to{stroke-dashoffset:0}}
+@keyframes nexoraStatShimmer{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+@keyframes nexoraStatPulse{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
+.stats-row>*{animation:nexoraStatRise .65s cubic-bezier(.2,.8,.2,1) both!important}
+.stats-row>*:nth-child(2){animation-delay:.12s!important}.stats-row>*:nth-child(3){animation-delay:.24s!important}
+.stats-row>*{position:relative;overflow:hidden!important;transform:translateY(0);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease,border-color .3s ease!important}
+.stats-row>*:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.08) 48%,transparent 70%);transform:translateX(-120%);opacity:0}
+.stats-row>*:hover{transform:translateY(-7px) scale(1.015)!important;box-shadow:0 12px 30px rgba(39,255,220,.18),0 0 28px rgba(173,106,255,.15)!important;border-color:rgba(123,255,235,.7)!important}
+.stats-row>*:hover:before{opacity:1;animation:nexoraStatShimmer .9s ease}
+.stats-row svg{filter:drop-shadow(0 0 5px rgba(87,255,226,.35));transition:transform .25s ease,filter .25s ease}
+.stats-row>*:hover svg{transform:scale(1.1);filter:drop-shadow(0 0 9px rgba(87,255,226,.7))}
+.stats-row .stat-value,.stats-row h2,.stats-row h3,.stats-row strong{font-variant-numeric:tabular-nums;text-shadow:0 0 16px rgba(78,244,223,.12)}
+.stats-row svg path[stroke],.stats-row svg polyline,.stats-row svg line{stroke-dasharray:650;stroke-dashoffset:0;animation:nexoraChartDraw 1.6s ease-out both}
+.stats-row>*:nth-child(2) svg path[stroke],.stats-row>*:nth-child(2) svg polyline{animation-delay:.2s}
+.stats-row>*:nth-child(3) svg path[stroke],.stats-row>*:nth-child(3) svg polyline{animation-delay:.4s}
+@media(prefers-reduced-motion:reduce){.stats-row>*{animation:none!important;transition:none!important}.stats-row svg path[stroke],.stats-row svg polyline,.stats-row svg line{animation:none!important}}
