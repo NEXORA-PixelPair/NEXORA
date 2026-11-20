@@ -585,7 +585,7 @@ app.patch('/api/reports/:id/approve', auth, async (req, res) => {
   const reviewedAt = new Date().toISOString();
   const reviewHistory = [...(existing.reviewHistory || []), { action: 'approved', reviewedBy: req.auth.name, reviewedAt }];
   const report = await updateOwned('reports', req.params.id, req.ownerId, { status: 'approved', reviewedBy: req.auth.name, reviewedAt, reviewHistory });
-  res.json(report);
+  await createNotification(req.ownerId, { title: 'Pass-on report approved', message: 'Report ' + (report.title || report.repoFullName || 'handover report') + ' was approved.', type: 'project_activity' });\n  res.json(report);
 });
 app.get('/api/sources', auth, async (req, res) => res.json(await listOwned('sources', req.ownerId)));
 app.post('/api/sources', auth, async (req, res) => {
