@@ -1519,3 +1519,19 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .nexora-bot-panel header .bot-avatar{box-shadow:0 0 15px rgba(67,255,225,.35)!important;animation:nexoraOrbPulse 4s ease-in-out infinite}
 .nexora-bot-panel header small i{box-shadow:0 0 8px #4effd7}
 @media(prefers-reduced-motion:reduce){.nexora-bot-orb,.nexora-bot-orb:before,.nexora-bot-orb:after,.bot-mini-message.bot-typing i,.bot-voice-btn.listening:after,.voice-button.listening:after{animation:none!important}}
+
+
+/* Floating AI bot microphone: live listening waveform */
+.nexora-bot-panel .bot-voice-btn{position:relative;isolation:isolate;display:grid;place-items:center;font-size:0;transition:transform .2s,background .2s,color .2s;}
+.nexora-bot-panel .bot-voice-btn::before{content:'🎤';font-size:16px;position:relative;z-index:2;}
+.nexora-bot-panel .bot-voice-btn.listening{color:#fff;background:linear-gradient(135deg,#ff3f87,#8b5cf6)!important;animation:micListeningPulse .85s ease-in-out infinite;}
+.nexora-bot-panel .bot-voice-btn.listening::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(255,75,145,.55);animation:micWaveRing 1.1s ease-out infinite;z-index:0;}
+.nexora-bot-panel .bot-voice-btn.listening::before{animation:micEmojiBounce .45s ease-in-out infinite alternate;}
+@keyframes micListeningPulse{50%{box-shadow:0 0 18px rgba(255,66,145,.65);transform:scale(1.08)}}
+@keyframes micWaveRing{0%{transform:scale(.72);opacity:.85}100%{transform:scale(1.65);opacity:0}}
+@keyframes micEmojiBounce{to{transform:translateY(-2px) scale(1.12)}}
+/* Sharper, friendly robot mark for the floating assistant */
+.nexora-bot-orb>svg{position:relative;z-index:2;stroke-width:2.25;filter:drop-shadow(0 0 5px rgba(80,245,255,.65));transition:transform .25s;}
+.nexora-float-bot:hover .nexora-bot-orb>svg{transform:rotate(-7deg) scale(1.12)}
+.nexora-bot-panel .bot-avatar{display:grid;place-items:center;background:linear-gradient(135deg,#20d9ef,#7864ff);box-shadow:0 0 16px rgba(70,205,255,.4);border:1px solid rgba(255,255,255,.25);}
+.nexora-bot-panel .bot-avatar svg{stroke-width:2.4;filter:drop-shadow(0 0 3px rgba(255,255,255,.3));}
