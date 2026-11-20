@@ -501,7 +501,6 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
         </form>
         <div className="login-social-divider"><span/>OR<span/></div>
         <div className="reference-socials">
-          <a href="https://github.com/NEXORA-PixelPair/NEXORA" target="_blank" rel="noreferrer" aria-label="NEXORA on GitHub"><Github size={23}/></a>
           <button type="button" onClick={onGoogle} aria-label="Continue with Google"><GoogleMark/></button>
         </div>
         {notice && <div className="login-alert"><AlertTriangle size={15}/>{notice}</div>}
