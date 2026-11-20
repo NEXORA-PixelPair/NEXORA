@@ -30,6 +30,8 @@ function App() {
   const [githubStatus, setGithubStatus] = useState({ connected: false, login: null });
   const [selectedReport, setSelectedReport] = useState(null);
   const [question, setQuestion] = useState('');
+  const [floatingBotOpen, setFloatingBotOpen] = useState(false); const [floatingBotInput, setFloatingBotInput] = useState(''); const [floatingBotChat, setFloatingBotChat] = useState([{role:'assistant',text:'Hi! I’m NEXORA Bot. Ask me about your project workspace.'}]); const [floatingBotBusy, setFloatingBotBusy] = useState(false);
+
   const [chat, setChat] = useState([WELCOME_CHAT]);
   const [sources, setSources] = useState([]);
   const [sourceForm, setSourceForm] = useState({ name: '', content: '', type: 'Project document' });
@@ -231,6 +233,7 @@ function App() {
     try { const updated = await api(`/reports/${selectedReport._id}/approve`, { method: 'PATCH', body: '{}' }); if (localStorage.getItem('nexora_token') !== requestToken) return; setSelectedReport(updated); await refresh(); if (localStorage.getItem('nexora_token') !== requestToken) return; setNotice('Pass-on report approved for sharing.'); }
     catch (error) { setNotice(error.message); }
   }
+  async function submitFloatingBot(event) { event.preventDefault(); const q=floatingBotInput.trim(); if(!q || floatingBotBusy) return; const activeToken=token; setFloatingBotInput(''); setFloatingBotChat(prev=>[...prev,{role:'user',text:q}]); setFloatingBotBusy(true); try { const response=await fetch(`${API}/ai/ask`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${activeToken}`},body:JSON.stringify({question:q})}); const result=await response.json().catch(()=>({})); if(!response.ok) throw new Error(result.message||'AI request failed.'); if(localStorage.getItem('nexora_token')!==activeToken)return; setFloatingBotChat(prev=>[...prev,{role:'assistant',text:result.answer}]); } catch(e){setFloatingBotChat(prev=>[...prev,{role:'assistant',text:e.message}]);} finally{setFloatingBotBusy(false);} }
   async function submitQuestion(event) {
     event.preventDefault(); const q = question.trim(); if (!q) return;
     const requestToken = token;
@@ -316,6 +319,7 @@ function App() {
         {page === 'Settings' && <SettingsPage user={user} isMock={isMock} githubStatus={githubStatus} ai={workspace.ai} storage={workspace.storage} onConnect={startGithubConnect} onDisconnect={async()=>{try{await api('/github/disconnect',{method:'POST',body:'{}'});setGithubStatus({connected:false});setRepositoryList([]);setNotice('GitHub disconnected.')}catch(e){setNotice(e.message)}}}/>}
       </div>
     </main>
+    <div className={`nexora-float-bot ${floatingBotOpen?'bot-open':''}`}><button className="nexora-bot-orb" aria-label="Open NEXORA AI bot" aria-expanded={floatingBotOpen} onClick={()=>setFloatingBotOpen(v=>!v)}><span className="bot-orb-glow"/><Bot size={23}/><i/></button>{floatingBotOpen && <section className="nexora-bot-panel"><header><div className="bot-avatar"><Bot size={18}/></div><div><b>NEXORA Bot</b><small><i/> AI assistant</small></div><button className="icon-button" onClick={()=>setFloatingBotOpen(false)} aria-label="Close AI bot"><X size={17}/></button></header><div className="bot-mini-messages">{floatingBotChat.map((msg,i)=><div className={`bot-mini-message ${msg.role}`} key={i}>{msg.text}</div>)}{floatingBotBusy && <div className="bot-mini-message assistant bot-typing"><i/><i/><i/></div>}</div><form onSubmit={submitFloatingBot}><input value={floatingBotInput} onChange={e=>setFloatingBotInput(e.target.value)} placeholder="Ask NEXORA anything…"/><button disabled={!floatingBotInput.trim()||floatingBotBusy} aria-label="Send message"><Send size={17}/></button></form></section>}</div>
     {notice && <div className="toast"><span className="toast-mark"><Check size={14}/></span>{notice}<button onClick={() => setNotice('')}><X size={15}/></button></div>}
   </div>{intro}</>;
 }
