@@ -1448,3 +1448,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .nav-link.active:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,rgba(255,92,177,.16),rgba(255,213,98,.12),rgba(80,255,218,.18),rgba(112,154,255,.18),rgba(190,110,255,.16));background-size:250% 100%;animation:nexoraRainbowSweep 5s linear infinite}
 .nav-link.active:after{content:"";position:absolute;left:0;top:5px;bottom:5px;width:2px;border-radius:3px;background:linear-gradient(180,#ff5fb8,#ffd66a,#54ffdb,#75aaff,#c178ff);box-shadow:0 0 9px #55ffe0,0 0 15px #b778ff}
 @media(prefers-reduced-motion:reduce){.sidebar:before,.sidebar:after,.sidebar-brand-lockup:after,.nav-link.active:before{animation:none!important}}
+
+/* Workspace identity card — match the glowing dotted rainbow reference */
+@keyframes workspaceRainbowBorder{0%,100%{background-position:0% 50%;filter:hue-rotate(0)}50%{background-position:100% 50%;filter:hue-rotate(18deg)}}
+@keyframes workspaceDotGlow{0%,100%{opacity:.42}50%{opacity:.95}}
+.workspace-tag{position:relative!important;isolation:isolate;overflow:hidden!important;border:1px solid transparent!important;border-radius:15px!important;padding:13px 12px!important;background:linear-gradient(115deg,rgba(3,94,91,.82),rgba(8,38,49,.94) 58%,rgba(11,54,54,.88)) padding-box,linear-gradient(100deg,#4dffe1,#52d8ff,#c77cff,#ff79d0,#68ffbb) border-box!important;background-size:100% 100%,260% 260%!important;animation:workspaceRainbowBorder 8s ease-in-out infinite!important;box-shadow:0 0 10px rgba(43,255,216,.4),0 0 25px rgba(59,224,211,.23),inset 0 0 18px rgba(35,242,207,.15)!important}
+.workspace-tag:before{content:"";position:absolute;z-index:-1;right:3px;top:3px;bottom:3px;width:44%;background-image:radial-gradient(circle,rgba(124,255,227,.9) 1px,transparent 1.5px);background-size:7px 7px;mask-image:linear-gradient(90deg,transparent,black 25%);opacity:.65;animation:workspaceDotGlow 3.2s ease-in-out infinite;pointer-events:none}
+.workspace-tag:after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(100deg,transparent 45%,rgba(255,110,217,.14),rgba(77,255,220,.2));pointer-events:none}
+.workspace-tag>*{position:relative;z-index:1}.workspace-avatar{width:36px!important;height:36px!important;border-radius:10px!important;background:linear-gradient(140deg,#14b8b1,#0b8f8c)!important;box-shadow:0 0 12px rgba(43,255,225,.35);border:1px solid rgba(123,255,236,.35)}
+.workspace-tag b{font-size:13px!important;color:#f3fffc!important}.workspace-tag small{font-size:10px!important;color:rgba(225,255,250,.72)!important}
+@media(prefers-reduced-motion:reduce){.workspace-tag{animation:none!important}.workspace-tag:before{animation:none!important}}
