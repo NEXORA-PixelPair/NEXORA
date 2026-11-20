@@ -1579,3 +1579,8 @@ h1,h2,h3,h4,.page-heading h1,.banner-copy h2,.brand-wordmark,.sidebar{font-famil
 .sidebar .account-copy b{font-size:24px!important;color:#fff!important;}
 .sidebar .account-copy small{font-size:14px!important;color:rgba(255,255,255,.88)!important;letter-spacing:.025em!important;}
 .sidebar .account-scope-dot{background:#e8fffb!important;box-shadow:0 0 9px rgba(255,255,255,.65)!important;}
+
+
+/* Make the account name 'suh' the main focal text */
+.sidebar .account-copy b{font-size:30px!important;font-weight:800!important;letter-spacing:-.04em!important;line-height:1.1!important;text-shadow:0 1px 2px rgba(0,30,45,.16)!important;}
+.sidebar .account-copy small{font-size:13px!important;opacity:.92!important;}
