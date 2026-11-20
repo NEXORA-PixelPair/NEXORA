@@ -1259,3 +1259,75 @@ button:not(:disabled):active{transform:scale(.98)}
 @keyframes profileAura{0%,100%{box-shadow:0 0 0 0 rgba(69,240,220,.05)}50%{box-shadow:0 0 0 5px rgba(69,240,220,.09),0 0 18px rgba(155,130,255,.15)}}
 @keyframes profileEnter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.sidebar .brand,.sidebar .brand-mark,.sidebar .brand-wordmark,.sidebar nav button:before,.sidebar nav button svg,.sidebar .nav-group-title,.sidebar .section-label,.sidebar .eyebrow,.sidebar nav button .badge,.sidebar nav button .count,.sidebar .notification-badge,.sidebar .avatar,.sidebar .user-avatar,.sidebar .profile-avatar,.sidebar .sidebar-footer,.sidebar .sidebar-user,.sidebar .account-card{animation:none!important;transition:none!important}}
+
+/* Ultimate motion layer: aurora, mouse glow, parallax, stars, page-specific motion */
+.app-frame{--mouse-x:50%;--mouse-y:50%;--parallax-x:0px;--parallax-y:0px;isolation:isolate}
+.ambient-effects{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.ambient-effects:before{content:"";position:absolute;inset:-25%;background:radial-gradient(ellipse at 20% 35%,rgba(20,226,198,.16),transparent 32%),radial-gradient(ellipse at 75% 20%,rgba(109,91,255,.17),transparent 35%),radial-gradient(ellipse at 68% 80%,rgba(255,94,174,.11),transparent 30%),radial-gradient(ellipse at 35% 90%,rgba(60,150,255,.1),transparent 28%);filter:blur(34px);animation:auroraDrift 24s ease-in-out infinite alternate;transform:translate3d(var(--parallax-x),var(--parallax-y),0)}
+.ambient-effects:after{content:"";position:absolute;inset:0;background:radial-gradient(320px circle at var(--mouse-x) var(--mouse-y),rgba(74,240,220,.105),transparent 70%);transition:background .12s ease}
+.shooting-star{position:absolute;width:130px;height:2px;opacity:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),rgba(90,220,255,.8),transparent);filter:drop-shadow(0 0 5px rgba(100,220,255,.8));transform:rotate(-24deg);animation:shootingStar 11s linear infinite}
+.star-a{top:18%;left:72%;animation-delay:1s}.star-b{top:47%;left:92%;animation-delay:6.2s}.star-c{top:78%;left:54%;animation-delay:9s}
+.main-area,.sidebar,.topbar{position:relative;z-index:1}
+.overview-banner{isolation:isolate}
+.overview-banner:before{background-size:200% 200%;animation:bannerLightSweep 9s linear infinite,overviewGlowDrift 13s ease-in-out infinite alternate!important}
+.graphic-ring{position:absolute;transform-origin:center;animation:orbitSpin 25s linear infinite!important}
+.ring-2{animation-duration:37s!important;animation-direction:reverse!important}
+.graphic-chip{offset-path:ellipse(115px 90px at 50% 50%);animation:chipOrbit 10s linear infinite!important}
+.chip-2{animation-duration:13s!important;animation-delay:-4s!important}.chip-3{animation-duration:15s!important;animation-delay:-8s!important}
+.graphic-core{animation:logoFloatSpin 5.5s ease-in-out infinite!important}
+.graphic-core:hover{animation:logoEnergy 1s ease-out!important;filter:drop-shadow(0 0 22px #45f0dc)}
+.stat-card,.project-preview,.repo-card,.risk-card,.settings-card,.notification-card,.report-preview,.analysis-result,.assistant-shell,.source-card,.reconstruction-item{transform-style:preserve-3d;transition:transform .22s ease,border-color .25s ease,box-shadow .25s ease;will-change:transform}
+.stat-card:hover,.project-preview:hover,.repo-card:hover,.risk-card:hover,.settings-card:hover,.notification-card:hover,.report-preview:hover,.analysis-result:hover,.assistant-shell:hover,.source-card:hover,.reconstruction-item:hover{transform:translateY(-6px) rotateX(1.5deg) rotateY(-1.5deg);box-shadow:0 18px 45px rgba(0,0,0,.25),0 0 24px rgba(88,190,255,.1)}
+.stat-card .stat-value,.stat-card h2,.stat-card strong{animation:numberPop .8s cubic-bezier(.2,.8,.2,1) both}
+.stat-card:nth-child(2) .stat-value,.stat-card:nth-child(2) h2,.stat-card:nth-child(2) strong{animation-delay:.15s}
+.stat-card:nth-child(3) .stat-value,.stat-card:nth-child(3) h2,.stat-card:nth-child(3) strong{animation-delay:.3s}
+.nav-group{animation:navGroupReveal .55s ease both}
+.nav-group:nth-of-type(2){animation-delay:.08s}.nav-group:nth-of-type(3){animation-delay:.16s}.nav-group:nth-of-type(4){animation-delay:.24s}
+.nav-link.active{overflow:hidden}
+.nav-link.active:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(110deg,transparent,rgba(255,255,255,.12),transparent);transform:translateX(-120%);animation:activeNavSweep 3s ease-in-out infinite}
+.nav-link:hover svg{animation:iconWiggle .5s ease}
+.nav-link.active svg{filter:drop-shadow(0 0 8px rgba(69,240,220,.4))}
+.radar-intro{position:relative;overflow:hidden}
+.radar-intro:after{content:"";position:absolute;left:0;right:0;top:-100%;height:100%;background:linear-gradient(180deg,transparent,rgba(69,240,220,.12),transparent);animation:radarScan 4s linear infinite}
+.radar-intro:before{content:"";position:absolute;right:4%;top:8%;width:180px;height:180px;border-radius:50%;border:1px solid rgba(69,240,220,.12);background:conic-gradient(from 0deg,transparent 0 78%,rgba(69,240,220,.2));animation:radarSweep 8s linear infinite}
+.risk-level{animation:riskPulse 2.6s ease-in-out infinite}
+.assistant-orb,.bot-avatar{position:relative;animation:botIdleFloat 4s ease-in-out infinite}
+.nexora-float-bot{animation:botIdleFloat 4.4s ease-in-out infinite}
+.nexora-bot-orb{overflow:visible;position:relative}
+.nexora-bot-orb:after{content:"";position:absolute;inset:-9px;border:1px solid rgba(69,240,220,.22);border-radius:50%;animation:botHalo 3.2s ease-in-out infinite}
+.nexora-bot-orb:active{animation:botEnergyBurst .55s ease-out}
+.bot-open .nexora-bot-orb:after{animation:botHalo .9s ease-in-out infinite}
+.nexora-bot-panel{transform-origin:bottom right;animation:botPanelSpring .42s cubic-bezier(.2,.85,.25,1.2) both}
+.bot-mini-message.assistant{animation:messageReveal .45s ease both}
+.bot-typing i{animation:typingDot .9s ease-in-out infinite}.bot-typing i:nth-child(2){animation-delay:.15s}.bot-typing i:nth-child(3){animation-delay:.3s}
+.settings-card-icon svg{animation:settingsIconFloat 4s ease-in-out infinite}
+.report-preview,.pass-on-report-card{transform-origin:top center;animation:paperUnfold .65s cubic-bezier(.2,.8,.2,1) both}
+.notification-bell,.notifications-heading svg{transform-origin:top center}
+.notification-card:hover .notification-bell{animation:bellShake .65s ease}
+.project-card,.project-preview{animation:projectStagger .6s cubic-bezier(.2,.8,.2,1) both}
+.project-card:nth-child(2),.project-preview:nth-child(2){animation-delay:.1s}.project-card:nth-child(3),.project-preview:nth-child(3){animation-delay:.2s}.project-card:nth-child(4){animation-delay:.3s}
+@keyframes auroraDrift{0%{transform:translate3d(-2%,0,0) scale(1) rotate(-3deg);filter:hue-rotate(0)}50%{transform:translate3d(2%,3%,0) scale(1.08) rotate(2deg);filter:hue-rotate(25deg)}100%{transform:translate3d(1%,-2%,0) scale(1.04) rotate(4deg);filter:hue-rotate(-18deg)}}
+@keyframes shootingStar{0%,70%,100%{opacity:0;transform:translate(0,0) rotate(-24deg)}72%{opacity:1}78%{opacity:0;transform:translate(-340px,180px) rotate(-24deg)}}
+@keyframes bannerLightSweep{0%{background-position:-120% 0,0 0}100%{background-position:220% 0,100% 100%}}
+@keyframes orbitSpin{to{rotate:360deg}}
+@keyframes chipOrbit{to{offset-distance:100%}}
+@keyframes logoFloatSpin{0%,100%{transform:translateY(0) rotate(0) scale(1)}50%{transform:translateY(-9px) rotate(4deg) scale(1.035)}}
+@keyframes logoEnergy{0%{transform:scale(1)}45%{transform:scale(1.18);filter:drop-shadow(0 0 30px #45f0dc)}100%{transform:scale(1);filter:drop-shadow(0 0 7px #9b82ff)}}
+@keyframes numberPop{from{opacity:0;transform:translateY(12px) scale(.86)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes navGroupReveal{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes activeNavSweep{to{transform:translateX(120%)}}
+@keyframes iconWiggle{0%,100%{rotate:0deg}50%{rotate:-10deg}}
+@keyframes radarScan{to{top:110%}}
+@keyframes radarSweep{to{rotate:360deg}}
+@keyframes riskPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.45);box-shadow:0 0 12px currentColor}}
+@keyframes botIdleFloat{0%,100%{translate:0 0}50%{translate:0 -5px}}
+@keyframes botHalo{0%,100%{transform:scale(.92);opacity:.35}50%{transform:scale(1.12);opacity:.8}}
+@keyframes botEnergyBurst{0%{scale:1}45%{scale:1.18;filter:drop-shadow(0 0 18px #45f0dc)}100%{scale:1}}
+@keyframes botPanelSpring{from{opacity:0;transform:translateY(18px) scale(.88)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes messageReveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes typingDot{0%,100%{translate:0 0;opacity:.35}50%{translate:0 -4px;opacity:1}}
+@keyframes settingsIconFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(4deg)}}
+@keyframes paperUnfold{from{opacity:0;transform:perspective(700px) rotateX(-12deg);clip-path:inset(0 0 100%)}to{opacity:1;transform:perspective(700px) rotateX(0);clip-path:inset(0 0 0)}}
+@keyframes bellShake{0%,100%{rotate:0deg}20%,60%{rotate:-12deg}40%,80%{rotate:12deg}}
+@keyframes projectStagger{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.ambient-effects:before,.ambient-effects:after,.shooting-star,.graphic-ring,.graphic-chip,.graphic-core,.stat-card .stat-value,.stat-card h2,.stat-card strong,.nav-group,.nav-link.active:after,.radar-intro:before,.radar-intro:after,.risk-level,.assistant-orb,.bot-avatar,.nexora-float-bot,.nexora-bot-orb:after,.nexora-bot-panel,.bot-mini-message.assistant,.bot-typing i,.settings-card-icon svg,.report-preview,.pass-on-report-card,.notification-card:hover .notification-bell,.project-card,.project-preview{animation:none!important;transition:none!important}}
