@@ -704,6 +704,11 @@ body{background:#001317;color:var(--offwhite)}
 .reference-login .mark-orbit.orbit-b{width:145px;height:60px}
 .reference-login .login-intro h2{font-size:27px;margin:2px 0 6px}
 .reference-login .login-intro p{font-size:16px;margin:0 0 28px;color:#aebfc2}
+.reference-login .demo-credentials{margin:-12px 0 16px;padding:13px 15px;border:1px solid rgba(45,208,211,.42);border-radius:13px;background:rgba(0,26,31,.62);font-size:13px;color:#c5d9dc}
+.reference-login .demo-credentials-title{font-size:12px;letter-spacing:1.3px;color:#43e4df;font-weight:800;margin-bottom:8px}
+.reference-login .demo-credentials>div:not(.demo-credentials-title){display:flex;justify-content:space-between;gap:8px;margin:5px 0}
+.reference-login .demo-credentials code{color:#fff;font-size:12px}
+.reference-login .demo-credentials button{margin-top:9px;padding:7px 10px;border:1px solid rgba(45,208,211,.5);border-radius:8px;background:rgba(45,208,211,.12);color:#6ff3ee;cursor:pointer;font-weight:700}
 .reference-login .auth-form{gap:16px}
 .reference-login .auth-form .reference-field{display:block;margin:0}
 .reference-login .auth-input-wrap{height:56px;padding:0 19px;gap:15px;border-radius:16px;background:rgba(0,12,17,.54);border-color:rgba(45,208,211,.72)}
