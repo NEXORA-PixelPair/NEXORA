@@ -1584,3 +1584,12 @@ h1,h2,h3,h4,.page-heading h1,.banner-copy h2,.brand-wordmark,.sidebar{font-famil
 /* Make the account name 'suh' the main focal text */
 .sidebar .account-copy b{font-size:30px!important;font-weight:800!important;letter-spacing:-.04em!important;line-height:1.1!important;text-shadow:0 1px 2px rgba(0,30,45,.16)!important;}
 .sidebar .account-copy small{font-size:13px!important;opacity:.92!important;}
+
+
+/* Refine workspace identity card directly under the NEXORA logo */
+.sidebar .workspace-tag{min-height:76px!important;padding:16px 17px!important;gap:14px!important;margin:14px 0 26px!important;border-radius:17px!important;background:linear-gradient(110deg,rgba(16,116,111,.34),rgba(35,97,143,.28) 55%,rgba(98,62,138,.3))!important;border:1px solid rgba(101,231,223,.26)!important;box-shadow:0 9px 24px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.09)!important;animation:none!important;overflow:hidden!important;}
+.sidebar .workspace-tag:before{opacity:.2!important;background-image:radial-gradient(circle,rgba(255,255,255,.65) 1px,transparent 1.7px)!important;background-size:13px 13px!important;animation:none!important;}
+.sidebar .workspace-tag:after{opacity:.18!important;}
+.sidebar .workspace-avatar{width:48px!important;height:48px!important;min-width:48px!important;border-radius:14px!important;font-size:20px!important;background:linear-gradient(145deg,#1bc5bb,#147da1)!important;box-shadow:0 0 0 1px rgba(140,255,245,.3),0 6px 14px rgba(0,0,0,.2)!important;}
+.sidebar .workspace-tag b{font-family:'Outfit',sans-serif!important;font-size:16px!important;font-weight:800!important;letter-spacing:-.025em!important;color:#f7ffff!important;line-height:1.2!important;}
+.sidebar .workspace-tag small{font-family:'Plus Jakarta Sans',sans-serif!important;font-size:12px!important;font-weight:600!important;letter-spacing:.01em!important;color:#c2e9f2!important;line-height:1.4!important;margin-top:5px!important;}
