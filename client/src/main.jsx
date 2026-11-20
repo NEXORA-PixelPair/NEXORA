@@ -116,6 +116,12 @@ function App() {
     return () => { document.removeEventListener('mousedown', closeOnOutside); document.removeEventListener('keydown', closeOnEscape); };
   }, [profileOpen]);
   useEffect(() => {
+    if (!token) return;
+    refreshNotificationData(token);
+    const poll = window.setInterval(() => refreshNotificationData(token), 15000);
+    return () => window.clearInterval(poll);
+  }, [token]);
+  useEffect(() => {
     if (!token) { resetAccountScopedState(); return; }
     loadWorkspace(token).catch(error => {
       if (localStorage.getItem('nexora_token') !== token) return;
