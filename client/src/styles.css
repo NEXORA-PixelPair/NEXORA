@@ -1464,3 +1464,18 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .workspace-tag{background:linear-gradient(115deg,rgba(0,255,207,.18),rgba(65,171,255,.2),rgba(180,95,255,.22),rgba(255,94,187,.2),rgba(255,188,75,.18),rgba(0,255,207,.18)) padding-box,linear-gradient(90deg,#38ffd9,#55baff,#b86cff,#ff73c6,#ffd66b,#43ffb8,#38ffd9) border-box!important;background-size:220% 220%,220% 220%!important;animation:workspaceFullRainbow 6s ease-in-out infinite!important;box-shadow:0 0 14px rgba(68,255,220,.32),0 0 28px rgba(188,105,255,.2),inset 0 0 25px rgba(255,255,255,.06)!important}
 .workspace-tag:after{background:linear-gradient(110deg,rgba(0,255,218,.1),rgba(70,160,255,.12),rgba(195,100,255,.16),rgba(255,105,195,.14),rgba(255,210,95,.12),rgba(0,255,218,.1))!important;background-size:250% 250%!important;animation:workspaceFullRainbow 8s linear infinite!important}
 .workspace-tag:before{background-image:radial-gradient(circle,rgba(255,255,255,.92) 1px,transparent 1.6px),radial-gradient(circle,rgba(112,255,226,.9) 1px,transparent 1.6px)!important;background-size:7px 7px,11px 11px!important;animation:workspaceDotGlow 2s ease-in-out infinite!important;opacity:.78!important}
+
+/* Interactive premium sidebar motion + rainbow active rail */
+@keyframes sidebarActiveRainbow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes sidebarIconAura{0%,100%{filter:drop-shadow(0 0 0 rgba(67,255,226,0))}50%{filter:drop-shadow(0 0 7px rgba(67,255,226,.65))}}
+.nav-link{position:relative;overflow:hidden;transform:translateX(0);transition:transform .24s cubic-bezier(.2,.8,.2,1),background .24s ease,color .2s ease,box-shadow .24s ease,border-color .24s ease!important;border:1px solid transparent!important}
+.nav-link svg{transition:transform .24s cubic-bezier(.2,.8,.2,1),filter .24s ease,color .2s ease!important}
+.nav-link:hover{transform:translateX(5px)!important;background:linear-gradient(100deg,rgba(37,255,215,.11),rgba(125,116,255,.09))!important;color:#eaffff!important;border-color:rgba(87,255,223,.15)!important;box-shadow:0 0 18px rgba(52,255,218,.1)!important}
+.nav-link:hover svg{transform:scale(1.13) rotate(-3deg)!important;color:#70ffe5!important;filter:drop-shadow(0 0 7px rgba(76,255,224,.8))!important}
+.nav-link.active{transform:translateX(3px)!important;background:linear-gradient(100deg,rgba(22,239,206,.16),rgba(111,120,255,.12),rgba(221,101,255,.12))!important;border:1px solid rgba(104,255,227,.42)!important;box-shadow:0 0 18px rgba(63,255,220,.18),inset 0 0 16px rgba(75,255,220,.07)!important;color:#efffff!important}
+.nav-link.active:after{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:5px;background:linear-gradient(180,#42ffdc,#64aaff,#c76aff,#ff78ca,#ffe16b,#42ffdc);background-size:100% 220%;animation:sidebarActiveRainbow 3s linear infinite;box-shadow:0 0 8px #50ffdf,0 0 16px #bc70ff}
+.nav-link.active svg{color:#76ffea!important;filter:drop-shadow(0 0 7px rgba(76,255,224,.7))!important;animation:sidebarIconAura 2.4s ease-in-out infinite}
+.nav-link:focus-visible{outline:2px solid rgba(100,255,225,.65)!important;outline-offset:2px}
+.nav-caption{transition:color .2s ease}
+.nav-group:hover .nav-caption{color:#a4f7e9}
+@media(prefers-reduced-motion:reduce){.nav-link,.nav-link svg,.nav-link.active:after{transition:none!important;animation:none!important}}
