@@ -570,7 +570,7 @@ app.get('/api/workspace', auth, async (req, res) => {
 });
 app.post('/api/projects', auth, async (req, res) => {
   if (!req.body?.name?.trim()) return res.status(400).json({ message: 'Project name is required.' });
-  const project = await insertOwned('projects', req.ownerId, { name: req.body.name.trim(), description: req.body.description || '', status: 'active' }); res.status(201).json(project);
+  const project = await insertOwned('projects', req.ownerId, { name: req.body.name.trim(), description: req.body.description || '', status: 'active' }); await createNotification(req.ownerId, { title: 'Project created', message: 'Project ' + project.name + ' was created in your workspace.', type: 'project_activity' }); res.status(201).json(project);
 });
 app.patch('/api/projects/:id', auth, async (req, res) => {
   const project = await updateOwned('projects', req.params.id, req.ownerId, { name: req.body.name, description: req.body.description });
@@ -595,7 +595,7 @@ app.post('/api/sources', auth, async (req, res) => {
   if (!allowedTypes.includes(type)) return res.status(400).json({ message: 'Choose a supported source type.' });
   const safeContent = redactPotentialSecrets(String(content)).slice(0, 50000);
   const source = await insertOwned('sources', req.ownerId, { name: String(name).slice(0, 160), content: safeContent, summary: safeContent.slice(0, 240), type, sourceUrl: String(sourceUrl || '').slice(0, 1000) });
-  res.status(201).json(source);
+  await createNotification(req.ownerId, { title: 'Knowledge source added', message: 'New source ' + source.name + ' was saved to project intelligence.', type: 'project_activity' }); res.status(201).json(source);
 });
 
 app.post('/api/ai/analyze', auth, async (req, res) => {
