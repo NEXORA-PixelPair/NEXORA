@@ -973,3 +973,13 @@ a,button,[role=button],input[type=checkbox],select{cursor:url("data:image/svg+xm
 @keyframes typing-bounce{to{transform:translateY(-4px);opacity:.5}}
 @media(max-width:600px){.nexora-float-bot{right:14px;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}.nexora-bot-orb{width:54px;height:54px}.nexora-bot-panel{height:min(440px,calc(100vh - 100px))}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Standalone AI companion docked at the upper-right */
+.nexora-float-bot{top:18px;right:20px;z-index:1200}
+.nexora-bot-orb{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 30% 24%,#4cc7b7,#0e5558 65%,#102b35);border:1px solid rgba(129,240,219,.65);box-shadow:0 0 0 5px rgba(43,167,154,.07),0 10px 30px rgba(0,0,0,.3),0 0 24px rgba(43,167,154,.22)}
+.nexora-bot-panel{margin-top:0;transform-origin:top right;width:min(390px,calc(100vw - 26px));height:min(520px,calc(100vh - 88px));background:linear-gradient(155deg,var(--surface),rgba(18,30,34,.98));border-color:rgba(75,195,179,.4);box-shadow:0 24px 90px rgba(0,0,0,.44),0 0 30px rgba(43,167,154,.1)}
+.nexora-bot-panel>header{background:linear-gradient(100deg,rgba(43,167,154,.18),rgba(43,167,154,.02));padding:15px}
+.bot-avatar{border-radius:50%;width:38px;height:38px;box-shadow:0 0 18px rgba(43,167,154,.2)}
+.bot-mini-message{font-size:13px}
+.nexora-bot-panel form input{font-size:13px}
+@media(max-width:600px){.nexora-float-bot{top:12px;right:12px;bottom:auto}.nexora-bot-panel{height:min(470px,calc(100vh - 80px))}}
