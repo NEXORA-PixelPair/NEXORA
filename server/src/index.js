@@ -575,9 +575,11 @@ app.post('/api/projects', auth, async (req, res) => {
 });
 app.patch('/api/projects/:id', auth, async (req, res) => {
   const project = await updateOwned('projects', req.params.id, req.ownerId, { name: req.body.name, description: req.body.description });
-  if (!project) return res.status(404).json({ message: 'Project not found in this account.' }); res.json(project);
+  if (!project) return res.status(404).json({ message: 'Project not found in this account.' });
+  await createNotification(req.ownerId, { title: 'Project updated', message: 'Project ' + project.name + ' details were updated.', type: 'project_activity' });
+  res.json(project);
 });
-app.delete('/api/projects/:id', auth, async (req, res) => { const removed = await deleteOwned('projects', req.params.id, req.ownerId); if (!removed) return res.status(404).json({ message: 'Project not found.' }); res.json({ ok: true }); });
+app.delete('/api/projects/:id', auth, async (req, res) => { const removed = await deleteOwned('projects', req.params.id, req.ownerId); if (!removed) return res.status(404).json({ message: 'Project not found.' }); await createNotification(req.ownerId, { title: 'Project deleted', message: 'Project ' + (removed.name || 'project') + ' was deleted from your workspace.', type: 'project_activity' }); res.json({ ok: true }); });
 app.get('/api/reports', auth, async (req, res) => res.json(await listOwned('reports', req.ownerId)));
 app.get('/api/reports/:id', auth, async (req, res) => { const report = await findOwned('reports', req.params.id, req.ownerId); if (!report) return res.status(404).json({ message: 'Report not found.' }); res.json(report); });
 app.patch('/api/reports/:id/approve', auth, async (req, res) => {
@@ -647,6 +649,7 @@ app.post('/api/ai/analyze', auth, async (req, res) => {
       evidenceUsed: evidence.map(item => `${item.label} (${item.type})`),
       confidence: 'Not assessed — deterministic fallback only.'
     };
+    await createNotification(req.ownerId, { title: 'Project analysis completed', message: 'Project Intelligence finished analysing ' + evidence.length + ' evidence source(s).', type: 'project_activity' });
     res.json({ report, provider: aiReport ? 'Groq AI' : 'Evidence fallback', sourceCount: sourceRows.length, repositoryReportCount: latestReports.length, analysedAt: new Date().toISOString() });
   } catch (error) {
     res.status(error.status || 500).json({ message: error.message || 'Project intelligence analysis failed.' });
@@ -719,6 +722,7 @@ app.post('/api/ai/reconstruct', auth, realAccountOnly, async (req, res) => {
       aiProvider: reconstructed ? 'Groq AI' : 'Unavailable',
       reviewHistory: []
     });
+    await createNotification(req.ownerId, { title: 'Project reconstruction generated', message: 'A project knowledge reconstruction was created from ' + evidence.length + ' evidence source(s).', type: 'project_activity' });
     res.status(201).json({ reconstruction: report, reportId: String(saved._id), provider: reconstructed ? 'Groq AI' : 'Unavailable', evidenceCount: evidence.length, generatedAt });
   } catch (error) {
     res.status(error.status || 500).json({ message: error.message || 'Project knowledge reconstruction failed.' });
@@ -733,6 +737,7 @@ app.post('/api/risks/scan', auth, async (req, res) => {
       created.push(await insertOwned('risks', req.ownerId, { projectId: project._id, title: `No source material connected: ${project.name}`, description: 'This project has no ingested knowledge source. Add authorised project documents or generate a repository pass-on report.', severity: 'medium', resolved: false }));
     }
   }
+  if (created.length) await createNotification(req.ownerId, { title: 'New project risks detected', message: 'Risk scan found ' + created.length + ' new project risk(s). Review them in NEXORA.', type: 'project_activity' });
   res.json({ created: created.length, risks: await listOwned('risks', req.ownerId) });
 });
 function parseJsonIfPossible(value) {
