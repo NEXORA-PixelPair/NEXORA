@@ -531,7 +531,7 @@ app.post('/api/handover-requests', auth, async (req, res) => {
     if (req.isMock) return res.status(403).json({ message: 'Handover requests are disabled in mock mode.' });
     const recipientEmail = String(req.body?.recipientEmail || '').trim().toLowerCase();
     const repoFullName = String(req.body?.repoFullName || '').trim();
-    if (!/^\\S+@\\S+\\.\\S+$/.test(recipientEmail) || !repoFullName) return res.status(400).json({ message: 'Enter a recipient account email and repository.' });
+    if (!/^\S+@\S+\.\S+$/.test(recipientEmail) || !repoFullName) return res.status(400).json({ message: 'Enter a recipient account email and repository.' });
     const recipient = await findUserByEmail(recipientEmail);
     if (!recipient) return res.status(404).json({ message: 'No NEXORA account found for this email. Ask them to create an account first.' });
     if (String(recipient._id) === req.ownerId) return res.status(400).json({ message: 'You cannot send a handover request to yourself.' });
