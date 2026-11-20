@@ -25,7 +25,7 @@ const schemas = {
   Project: new mongoose.Schema({ ownerId: { type: String, index: true }, name: String, description: String, status: String }, { timestamps: true }),
   Report: new mongoose.Schema({ ownerId: { type: String, index: true }, repoFullName: String, repoUrl: String, title: String, summary: String, report: mongoose.Schema.Types.Mixed, createdBy: String, status: { type: String, default: 'pending_review' }, reviewedBy: String, reviewedAt: Date, sourceSnapshotAt: Date, aiProvider: String, reviewHistory: [mongoose.Schema.Types.Mixed] }, { timestamps: true }),
   Source: new mongoose.Schema({ ownerId: { type: String, index: true }, projectId: String, name: String, type: String, summary: String, content: String, sourceUrl: String }, { timestamps: true }),
-  Risk: new mongoose.Schema({ ownerId: { type: String, index: true }, projectId: String, repoFullName: String, sourceReportId: String, title: String, description: String, severity: String, category: String, type: String, evidenceIds: [String], evidenceUrls: [String], recommendedAction: String, resolved: { type: Boolean, default: false } }, { timestamps: true })
+  Risk: new mongoose.Schema({ ownerId: { type: String, index: true }, projectId: String, repoFullName: String, sourceReportId: String, title: String, description: String, severity: String, category: String, type: String, evidenceIds: [String], evidenceUrls: [String], recommendedAction: String, resolved: { type: Boolean, default: false } }, { timestamps: true }),\n  Notification: new mongoose.Schema({ ownerId: { type: String, index: true }, title: String, message: String, type: String, read: { type: Boolean, default: false }, action: String, requestId: String, fromUserId: String, fromEmail: String, status: String, metadata: mongoose.Schema.Types.Mixed }, { timestamps: true })
 };
 const models = Object.fromEntries(Object.entries(schemas).map(([name, schema]) => [name, mongoose.models[name] || mongoose.model(name, schema)]));
 
@@ -72,13 +72,13 @@ export async function initStore() {
   } else {
     try { fileDb = JSON.parse(await fs.readFile(filePath, 'utf8')); }
     catch { fileDb = { users: [], projects: [], reports: [], sources: [], risks: [] }; await persist(); }
-    for (const key of ['users', 'projects', 'reports', 'sources', 'risks']) fileDb[key] ||= [];
+    for (const key of ['users', 'projects', 'reports', 'sources', 'risks', 'notifications']) fileDb[key] ||= [];
     console.log('NEXORA using persistent local JSON storage for real accounts');
   }
   // Keep demonstration data isolated from real account storage, even when MongoDB is enabled.
   try { mockDb = JSON.parse(await fs.readFile(mockFilePath, 'utf8')); }
   catch { mockDb = demoSeed(); await persistMock(); }
-  for (const key of ['users', 'projects', 'reports', 'sources', 'risks']) mockDb[key] ||= [];
+  for (const key of ['users', 'projects', 'reports', 'sources', 'risks', 'notifications']) mockDb[key] ||= [];
 }
 
 export function storageMode(ownerId = null) {
@@ -111,7 +111,7 @@ export async function updateUser(id, patch) {
 }
 function cryptoRandom() { return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`; }
 
-const collectionModels = { projects: 'Project', reports: 'Report', sources: 'Source', risks: 'Risk' };
+const collectionModels = { projects: 'Project', reports: 'Report', sources: 'Source', risks: 'Risk', notifications: 'Notification' };
 export async function listOwned(collection, ownerId) {
   const modelName = collectionModels[collection]; if (!modelName) throw new Error('Unknown collection');
   if (isMockOwner(ownerId)) return mockDb[collection].filter(item => item.ownerId === ownerId).sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
