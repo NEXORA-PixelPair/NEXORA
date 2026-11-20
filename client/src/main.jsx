@@ -493,6 +493,7 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
           <h2>{authTab === 'register' ? <>Join NEXORA, <em>Creator</em></> : <>Welcome Back, <em>Creator</em></>}</h2>
           <p>{authTab === 'register' ? 'Create your account to continue' : 'Enter your credentials to continue'}</p>
         </div>
+        {authTab === 'login' && <div className="demo-credentials"><div className="demo-credentials-title">🧪 TEST ACCOUNT</div><div><span>Email</span><code>testcase9307@gmail.com</code></div><div><span>Password</span><code>12345678</code></div><button type="button" onClick={() => setForm({ ...form, email: 'testcase9307@gmail.com', password: '12345678' })}>Use test account ↗</button></div>}
         <form className="auth-form" onSubmit={onSubmit}>
           {authTab === 'register' && <label className="reference-name-field"><input required autoComplete="name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter your full name"/></label>}
           <label className="reference-field"><span className="auth-input-wrap"><Mail size={21}/><input type="email" autoComplete="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Enter your email address"/></span></label>
