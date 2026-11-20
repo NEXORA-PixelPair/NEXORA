@@ -1230,3 +1230,32 @@ button:not(:disabled):active{transform:scale(.98)}
 @keyframes toastIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes loadingFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @media(prefers-reduced-motion:reduce){.page-container,.page-container>*, .page-container h1,.page-container h2,.page-container .eyebrow,.app-frame:before,.app-frame:after,.sidebar nav button.active,.toast,.loading-screen>*{animation:none!important;transition:none!important}.page-container .card:after,.page-container .repo-card:after,.page-container .project-card:after,.page-container .report-card:after,.page-container .risk-card:after,.page-container .source-card:after,.page-container .settings-card:after,.page-container .project-list-card:after,.page-container .notification-card:after,.page-container .form-panel:after{animation:none!important}}
+
+
+/* Animate the complete navigation rail: labels, icons, groups, profile */
+.sidebar{overflow:hidden}
+.sidebar .brand,.sidebar .brand-mark,.sidebar .brand-wordmark{animation:navBrandMotion 5s ease-in-out infinite}
+.sidebar nav{position:relative}
+.sidebar nav button{position:relative;overflow:hidden;isolation:isolate}
+.sidebar nav button:before{content:"";position:absolute;inset:0;z-index:-1;opacity:0;background:linear-gradient(100deg,rgba(69,240,220,.04),rgba(155,130,255,.18),rgba(255,127,185,.12));background-size:220% 100%;transition:opacity .25s ease;animation:navColorFlow 8s linear infinite}
+.sidebar nav button:hover:before,.sidebar nav button.active:before{opacity:1}
+.sidebar nav button svg{transform-origin:center;transition:transform .3s cubic-bezier(.2,.8,.2,1),filter .3s ease}
+.sidebar nav button:hover svg{transform:rotate(-7deg) scale(1.13);filter:drop-shadow(0 0 7px rgba(69,240,220,.45))}
+.sidebar nav button.active svg{animation:navIconActive 3.4s ease-in-out infinite}
+.sidebar nav button .nav-label,.sidebar nav button span{transition:letter-spacing .25s ease,color .25s ease}
+.sidebar nav button:hover span{letter-spacing:.025em}
+.sidebar .nav-group-title,.sidebar .section-label,.sidebar .eyebrow{animation:navLabelFade 6s ease-in-out infinite}
+.sidebar nav button .badge,.sidebar nav button .count,.sidebar .notification-badge{animation:navBadgePop 2.6s ease-in-out infinite}
+.sidebar .account-card,.sidebar .user-card,.sidebar .sidebar-profile{transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease}
+.sidebar .account-card:hover,.sidebar .user-card:hover,.sidebar .sidebar-profile:hover{transform:translateY(-2px);box-shadow:0 0 22px rgba(69,240,220,.13)}
+.sidebar .avatar,.sidebar .user-avatar,.sidebar .profile-avatar{animation:profileAura 4s ease-in-out infinite}
+.sidebar .sidebar-footer,.sidebar .sidebar-user,.sidebar .account-card{animation:profileEnter .7s cubic-bezier(.2,.8,.2,1) both}
+.sidebar nav button:nth-child(1){animation-delay:.03s}.sidebar nav button:nth-child(2){animation-delay:.07s}.sidebar nav button:nth-child(3){animation-delay:.11s}.sidebar nav button:nth-child(4){animation-delay:.15s}.sidebar nav button:nth-child(5){animation-delay:.19s}.sidebar nav button:nth-child(6){animation-delay:.23s}.sidebar nav button:nth-child(7){animation-delay:.27s}
+@keyframes navBrandMotion{0%,100%{filter:drop-shadow(0 0 2px rgba(69,240,220,.12))}50%{filter:drop-shadow(0 0 10px rgba(69,240,220,.32))}}
+@keyframes navColorFlow{to{background-position:220% 0}}
+@keyframes navIconActive{0%,100%{filter:drop-shadow(0 0 2px rgba(69,240,220,.2));transform:scale(1)}50%{filter:drop-shadow(0 0 8px rgba(155,130,255,.45));transform:scale(1.06)}}
+@keyframes navLabelFade{0%,100%{opacity:.78}50%{opacity:1}}
+@keyframes navBadgePop{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes profileAura{0%,100%{box-shadow:0 0 0 0 rgba(69,240,220,.05)}50%{box-shadow:0 0 0 5px rgba(69,240,220,.09),0 0 18px rgba(155,130,255,.15)}}
+@keyframes profileEnter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.sidebar .brand,.sidebar .brand-mark,.sidebar .brand-wordmark,.sidebar nav button:before,.sidebar nav button svg,.sidebar .nav-group-title,.sidebar .section-label,.sidebar .eyebrow,.sidebar nav button .badge,.sidebar nav button .count,.sidebar .notification-badge,.sidebar .avatar,.sidebar .user-avatar,.sidebar .profile-avatar,.sidebar .sidebar-footer,.sidebar .sidebar-user,.sidebar .account-card{animation:none!important;transition:none!important}}
