@@ -1165,3 +1165,38 @@ button:not(:disabled):active{transform:scale(.98)}
 @keyframes ringBreath{0%,100%{opacity:.15;transform:scale(.98)}50%{opacity:.5;transform:scale(1.025)}}
 @keyframes markGlow{0%,100%{filter:drop-shadow(0 0 4px rgba(59,234,214,.2))}50%{filter:drop-shadow(0 0 12px rgba(59,234,214,.5))}}
 @media(prefers-reduced-motion:reduce){.welcome-block,.welcome-block .live-dot,.overview-banner:after,.graphic-ring:before,.graphic-core img,.overview-lower .section-title-row,.project-preview-grid .project-preview{animation:none!important}}
+
+/* Color-rich, high-energy Overview motion upgrade */
+:root{--overview-cyan:#45f0dc;--overview-violet:#9b82ff;--overview-pink:#ff7fb9;--overview-blue:#55a8ff;--overview-gold:#ffd47b}
+.app-frame{background-image:radial-gradient(ellipse at 8% 12%,rgba(40,232,206,.16),transparent 32%),radial-gradient(ellipse at 88% 22%,rgba(135,95,255,.13),transparent 31%),radial-gradient(ellipse at 76% 92%,rgba(255,105,165,.09),transparent 28%),radial-gradient(ellipse at 35% 72%,rgba(65,160,255,.08),transparent 30%)!important}
+.overview-banner{border:1px solid rgba(69,240,220,.55)!important;background:linear-gradient(118deg,rgba(0,65,68,.88),rgba(14,42,65,.9) 48%,rgba(44,29,69,.78))!important;box-shadow:0 0 0 1px rgba(155,130,255,.12),0 18px 55px rgba(0,0,0,.2),0 0 55px rgba(69,240,220,.09);animation:bannerColorWave 12s ease-in-out infinite alternate}
+.overview-banner:before{background:radial-gradient(circle at 70% 45%,rgba(69,240,220,.34),transparent 22%),radial-gradient(circle at 84% 60%,rgba(155,130,255,.26),transparent 28%),radial-gradient(circle at 55% 80%,rgba(255,127,185,.2),transparent 26%),linear-gradient(115deg,transparent 25%,rgba(255,255,255,.09) 48%,transparent 62%)!important;animation:overviewGlowDrift 8s ease-in-out infinite alternate,overviewColorBreath 7s ease-in-out infinite}
+.overview-banner:after{opacity:.42!important;background-image:radial-gradient(circle,rgba(69,240,220,.95) 1.2px,transparent 2px),radial-gradient(circle,rgba(255,127,185,.75) 1px,transparent 2px),radial-gradient(circle,rgba(255,212,123,.75) 1px,transparent 2px)!important;background-size:42px 42px,71px 71px,109px 109px!important;animation:colorParticles 18s linear infinite!important}
+.banner-kicker{color:var(--overview-gold)!important;text-shadow:0 0 18px rgba(255,212,123,.4)}
+.banner-copy h2 em{background:linear-gradient(90deg,var(--overview-cyan),#76baff,var(--overview-violet),var(--overview-pink),var(--overview-cyan));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:gradientTextFlow 8s linear infinite}
+.graphic-ring{border-color:rgba(69,240,220,.42)!important;filter:drop-shadow(0 0 12px rgba(69,240,220,.25))!important}
+.ring-2{border-color:rgba(155,130,255,.32)!important}
+.graphic-core{background:linear-gradient(145deg,#3cf1dd,#3f91ff 55%,#9c78ff)!important;border:1px solid rgba(255,255,255,.45)!important;box-shadow:0 0 32px rgba(69,240,220,.4),0 0 65px rgba(155,130,255,.22)!important;animation:coreBouncy 4s ease-in-out infinite!important}
+.graphic-chip{border-color:rgba(69,240,220,.65)!important;background:linear-gradient(145deg,rgba(5,25,39,.95),rgba(35,65,92,.9))!important;box-shadow:0 0 18px rgba(69,240,220,.25),0 0 0 3px rgba(155,130,255,.07)!important}
+.chip-1{animation:chipOrbitA 8s ease-in-out infinite!important}.chip-2{animation:chipOrbitB 9s ease-in-out infinite!important}.chip-3{animation:chipOrbitC 7.5s ease-in-out infinite!important}
+.stat-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(11,43,51,.92),rgba(12,25,43,.92))!important}
+.stat-card:before{content:"";position:absolute;inset:-1px;pointer-events:none;background:linear-gradient(120deg,transparent 15%,rgba(69,240,220,.14),rgba(155,130,255,.14),rgba(255,127,185,.12),transparent 85%);background-size:220% 220%;animation:cardColorSweep 8s ease-in-out infinite}
+.stat-card:nth-child(2){background:linear-gradient(145deg,rgba(16,40,62,.95),rgba(29,24,52,.92))!important}
+.stat-card:nth-child(3){background:linear-gradient(145deg,rgba(25,39,50,.94),rgba(49,32,47,.92))!important}
+.stat-card .teal-icon,.stat-card .stat-icon{filter:drop-shadow(0 0 8px rgba(69,240,220,.4))}
+.project-preview{background:linear-gradient(145deg,rgba(12,39,49,.95),rgba(25,30,52,.92))!important;border-color:rgba(155,130,255,.18)!important}
+.project-preview:hover{border-color:rgba(255,127,185,.45)!important;box-shadow:0 16px 38px rgba(0,0,0,.24),0 0 26px rgba(255,127,185,.12)!important}
+.welcome-block h1{text-shadow:0 0 26px rgba(69,240,220,.12)}
+.welcome-block .eyebrow{color:var(--overview-cyan)!important}
+.next-step-strip{background:linear-gradient(110deg,rgba(8,43,50,.94),rgba(36,29,54,.9))!important;border-color:rgba(155,130,255,.2)!important}
+.coral-button{box-shadow:0 8px 26px rgba(255,120,104,.22),0 0 18px rgba(255,127,185,.12)}
+@keyframes bannerColorWave{0%{background-position:0% 50%;box-shadow:0 18px 55px rgba(0,0,0,.2),0 0 28px rgba(69,240,220,.06)}100%{background-position:100% 50%;box-shadow:0 18px 55px rgba(0,0,0,.2),0 0 48px rgba(155,130,255,.13)}}
+@keyframes overviewColorBreath{0%,100%{filter:hue-rotate(0deg);opacity:.8}50%{filter:hue-rotate(35deg);opacity:1}}
+@keyframes colorParticles{from{background-position:0 0,20px 15px,5px 30px;transform:translateY(0)}to{background-position:-130px -170px,100px -90px,-80px -120px;transform:translateY(-2%)}}
+@keyframes gradientTextFlow{to{background-position:300% 0}}
+@keyframes coreBouncy{0%,100%{transform:rotate(0deg) translateY(0) scale(1)}25%{transform:rotate(5deg) translateY(-8px) scale(1.04)}50%{transform:rotate(-4deg) translateY(-3px) scale(.98)}75%{transform:rotate(3deg) translateY(-10px) scale(1.035)}}
+@keyframes chipOrbitA{0%,100%{translate:0 0;rotate:0deg}50%{translate:-9px -13px;rotate:8deg}}
+@keyframes chipOrbitB{0%,100%{translate:0 0;rotate:0deg}50%{translate:10px 10px;rotate:-8deg}}
+@keyframes chipOrbitC{0%,100%{translate:0 0;rotate:0deg}50%{translate:-7px 12px;rotate:6deg}}
+@keyframes cardColorSweep{0%{background-position:0% 50%;opacity:.2}50%{background-position:100% 50%;opacity:.75}100%{background-position:0% 50%;opacity:.25}}
+@media(prefers-reduced-motion:reduce){.overview-banner,.overview-banner:before,.overview-banner:after,.banner-copy h2 em,.graphic-core,.graphic-chip,.stat-card:before{animation:none!important}}
