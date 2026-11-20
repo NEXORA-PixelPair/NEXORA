@@ -43,6 +43,8 @@ function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('nexora_theme') || 'dark');
   const [profileOpen, setProfileOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [notificationSound, setNotificationSound] = useState(() => localStorage.getItem('nexora_notification_sound') !== 'off');
+  const previousNotificationIds = useRef(null);
   const [handoverRequests, setHandoverRequests] = useState([]);
   const [handoverForm, setHandoverForm] = useState({ recipientEmail: '', repoFullName: '', message: '' });
   const profileMenuRef = useRef(null);
@@ -66,7 +68,7 @@ function App() {
     setSelectedReport(null); setQuestion(''); setChat([WELCOME_CHAT]); setSources([]);
     setSourceForm({ name: '', content: '', type: 'Project document' }); setAnalysisResult(null); setAnalysisBusy(false); setReconstruction(null); setReconstructionBusy(false); setProjectForm({ name: '', description: '' });
     setAuthForm({ name: '', email: '', password: '' }); setAuthTab('login'); setBusy(false);
-    setProfileOpen(false); setMobileNav(false); setNotifications([]); setHandoverRequests([]);
+    setProfileOpen(false); setMobileNav(false); setNotifications([]); setHandoverRequests([]); previousNotificationIds.current = null;
   }
   function establishSession(result) {
     resetAccountScopedState();
@@ -178,7 +180,29 @@ function App() {
         fetch(`${API}/handover-requests`, { headers: { Authorization: `Bearer ${activeToken}` } }).then(r => r.ok ? r.json() : [])
       ]);
       if (localStorage.getItem('nexora_token') !== activeToken) return;
-      setNotifications(n || []); setHandoverRequests(h || []);
+      const incoming = n || [];
+      const ids = incoming.map(item => String(item.id ?? item._id ?? item.createdAt ?? item.title));
+      const previous = previousNotificationIds.current;
+      if (previous !== null && notificationSound && ids.some(id => !previous.includes(id))) {
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            const ctx = new AudioCtx(); const now = ctx.currentTime;
+            [880, 1175].forEach((freq, index) => {
+              const oscillator = ctx.createOscillator(); const gain = ctx.createGain();
+              oscillator.type = 'sine'; oscillator.frequency.value = freq;
+              gain.gain.setValueAtTime(0.0001, now + index * 0.11);
+              gain.gain.exponentialRampToValueAtTime(0.12, now + index * 0.11 + 0.015);
+              gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.11 + 0.18);
+              oscillator.connect(gain); gain.connect(ctx.destination);
+              oscillator.start(now + index * 0.11); oscillator.stop(now + index * 0.11 + 0.2);
+            });
+            window.setTimeout(() => ctx.close().catch(()=>{}), 700);
+          }
+        } catch {}
+      }
+      previousNotificationIds.current = ids;
+      setNotifications(incoming); setHandoverRequests(h || []);
     } catch {}
   }
   async function sendHandoverRequest(event) {
@@ -322,7 +346,7 @@ function App() {
     <main className="main-area">
       <header className="topbar"><button className="icon-button mobile-trigger" onClick={() => setMobileNav(true)}><Menu/></button><div className="breadcrumbs"><span>Workspace</span><ChevronRight size={15}/><b>{page}</b></div><div className="topbar-right"><span className={`mode-pill ${isMock ? 'mock-pill' : ''}`}><i/>{isMock ? 'MOCK DATABASE' : 'PRIVATE WORKSPACE'}</span><button className="icon-button refresh-button" onClick={refresh} title="Refresh workspace"><RefreshCw size={17}/></button><div className={`nexora-float-bot ${floatingBotOpen?'bot-open':''}`}><button className="nexora-bot-orb" aria-label="Open NEXORA AI bot" aria-expanded={floatingBotOpen} onClick={()=>setFloatingBotOpen(v=>!v)}><span className="bot-orb-glow"/><Bot size={23}/><i/></button>{floatingBotOpen && <section className="nexora-bot-panel"><header><div className="bot-avatar"><Bot size={18}/></div><div><b>NEXORA AI</b><small><i/> Online · Grok-style chat</small></div><button className="icon-button" onClick={()=>setFloatingBotOpen(false)} aria-label="Close AI bot"><X size={17}/></button></header><div className="bot-mini-messages">{floatingBotChat.map((msg,i)=><div className={`bot-mini-message ${msg.role}`} key={i}>{msg.text}</div>)}{floatingBotBusy && <div className="bot-mini-message assistant bot-typing"><i/><i/><i/></div>}</div><form onSubmit={submitFloatingBot}><input value={floatingBotInput} onChange={e=>setFloatingBotInput(e.target.value)} placeholder="Ask anything…"/><button disabled={!floatingBotInput.trim()||floatingBotBusy} aria-label="Send message"><Send size={17}/></button></form></section>}</div><div className="profile-menu-wrap" ref={profileMenuRef}><button className="profile-trigger" aria-label="Open profile menu" aria-expanded={profileOpen} onClick={() => setProfileOpen(open => !open)}><span className="top-user">{(user?.name || 'N').slice(0,1).toUpperCase()}</span><ChevronDown size={15}/></button>{profileOpen && <div className="profile-menu" role="menu"><div className="profile-menu-identity"><b>{user?.name || 'NEXORA User'}</b><small>{user?.email || 'Demo workspace'}</small><span>{isMock ? 'Mock database' : 'Private account'}</span></div><div className="profile-menu-divider"/><div className="profile-menu-label">Appearance</div><div className="theme-options"><button className={theme === 'dark' ? 'theme-option selected' : 'theme-option'} onClick={() => setTheme('dark')}><Moon size={15}/> Dark</button><button className={theme === 'light' ? 'theme-option selected' : 'theme-option'} onClick={() => setTheme('light')}><Sun size={15}/> Light</button></div><div className="profile-menu-divider"/><button className="profile-logout" role="menuitem" onClick={signOut}><LogOut size={16}/> Log out</button></div>}</div></div></header>
       <div className="page-container">
-        {page === 'Notifications' && <NotificationsPage notifications={notifications} requests={handoverRequests} userId={user?.id} form={handoverForm} setForm={setHandoverForm} onSend={sendHandoverRequest} onRead={markNotificationRead} onReadAll={markAllNotificationsRead} onRespond={respondHandover} onComplete={completeHandover} busy={busy} isMock={isMock}/> }
+        {page === 'Notifications' && <NotificationsPage notifications={notifications} requests={handoverRequests} userId={user?.id} form={handoverForm} setForm={setHandoverForm} onSend={sendHandoverRequest} onRead={markNotificationRead} onReadAll={markAllNotificationsRead} onRespond={respondHandover} onComplete={completeHandover} busy={busy} isMock={isMock} soundEnabled={notificationSound} onSoundToggle={() => { const next = !notificationSound; setNotificationSound(next); localStorage.setItem('nexora_notification_sound', next ? 'on' : 'off'); }}/> }
         {page === 'Overview' && <OverviewPage user={user} isMock={isMock} projects={projects} reports={reports} risks={risks} onPage={setPage} githubStatus={githubStatus}/>}
         {page === 'Projects' && <ProjectsPage projects={projects} onCreate={createProject} form={projectForm} setForm={setProjectForm} busy={busy}/>}
         {page === 'Repositories' && !isMock && <RepositoriesPage connected={githubStatus.connected} login={githubStatus.login} repos={repositoryList} filtered={filteredRepos} search={repoSearch} setSearch={setRepoSearch} onConnect={startGithubConnect} onLoad={loadRepositories} onReport={generateReport} onBulkReport={bulkGenerateReports} selection={managedRepoSelection} setSelection={setManagedRepoSelection} transferRequests={handoverRequests} busy={busy} notice={notice}/>}
@@ -478,11 +502,11 @@ function PageHeading({ kicker, title, description, action }) { return <div class
 function StatCard({ icon: Icon, label, value, detail, accent = false }) { return <div className={`stat-card ${accent ? 'accent-card' : ''}`}><div className="stat-icon"><Icon size={20}/></div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div>; }
 function EmptyState({ icon: Icon = CircleHelp, title, description, action }) { return <div className="empty-state"><div className="empty-icon"><Icon size={24}/></div><h3>{title}</h3><p>{description}</p>{action}</div>; }
 
-function NotificationsPage({ notifications, requests, userId, form, setForm, onSend, onRead, onReadAll, onRespond, onComplete, busy, isMock }) {
+function NotificationsPage({ notifications, requests, userId, form, setForm, onSend, onRead, onReadAll, onRespond, onComplete, busy, isMock, soundEnabled, onSoundToggle }) {
   const unread = notifications.filter(n => !n.read).length;
   const recent = notifications.slice(0, 5);
   const activityIcon = type => type === 'risk' || type === 'risk_scan' ? <AlertTriangle size={17}/> : type === 'analysis' || type === 'ai_analysis' ? <Sparkles size={17}/> : type === 'report' || type === 'pass_on_report' ? <FileText size={17}/> : type === 'project' || type === 'project_created' || type === 'project_updated' ? <FolderKanban size={17}/> : <Activity size={17}/>;
-  return <><PageHeading kicker="LIVE WORKSPACE UPDATES" title="Notifications & handovers." description="Request a repository handover, respond to requests, and keep a history of important project updates." action={unread > 0 ? <button className="outline-button" onClick={onReadAll}>Mark all read</button> : null}/>
+  return <><PageHeading kicker="LIVE WORKSPACE UPDATES" title="Notifications & handovers." description="Request a repository handover, respond to requests, and keep a history of important project updates." action={<div className="notification-actions"><button className="outline-button sound-toggle" onClick={onSoundToggle}>{soundEnabled ? '🔔 Sound on' : '🔕 Sound off'}</button>{unread > 0 && <button className="outline-button" onClick={onReadAll}>Mark all read</button>}</div>}/>
     <section className="activity-panel">
       <div className="activity-panel-head"><div><span className="eyebrow">PROJECT ACTIVITY</span><h2>What’s happening</h2><p>Important updates from your NEXORA workspace.</p></div><div className="activity-count"><b>{unread}</b><span>unread</span></div></div>
       <div className="activity-stats"><div><span>All updates</span><b>{notifications.length}</b></div><div><span>Unread</span><b>{unread}</b></div><div><span>Handover requests</span><b>{requests.length}</b></div></div>
