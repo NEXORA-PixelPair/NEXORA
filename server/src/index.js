@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   initStore, storageMode, findUserByEmail, findUserByGoogleId, findUserById, createUser, updateUser,
-  listOwned, insertOwned, findOwned, updateOwned, deleteOwned
+  listOwned, insertOwned, findOwned, updateOwned, deleteOwned, listHandoverForUser
 } from './store.js';
 
 const SERVER_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -509,10 +509,64 @@ app.post('/api/github/report', auth, realAccountOnly, async (req, res) => {
   } catch (error) { res.status(error.status || 500).json({ message: error.message || 'Could not generate the repository report.' }); }
 });
 
+
+async function createNotification(ownerId, payload) {
+  if (!ownerId || ownerId === 'mock-workspace') return null;
+  return insertOwned('notifications', ownerId, { title: payload.title, message: payload.message, type: payload.type || 'activity', read: false, action: payload.action || null, requestId: payload.requestId || null, fromUserId: payload.fromUserId || null, fromEmail: payload.fromEmail || null, status: payload.status || null, metadata: payload.metadata || {} });
+}
+app.get('/api/notifications', auth, async (req, res) => res.json((await listOwned('notifications', req.ownerId)).slice(0,100)));
+app.patch('/api/notifications/read-all', auth, async (req, res) => {
+  const rows = await listOwned('notifications', req.ownerId);
+  await Promise.all(rows.filter(n => !n.read).map(n => updateOwned('notifications', n._id, req.ownerId, { read: true })));
+  res.json({ ok: true });
+});
+app.patch('/api/notifications/:id/read', auth, async (req, res) => {
+  const item = await updateOwned('notifications', req.params.id, req.ownerId, { read: true });
+  if (!item) return res.status(404).json({ message: 'Notification not found.' });
+  res.json(item);
+});
+app.get('/api/handover-requests', auth, async (req, res) => res.json(await listHandoverForUser(req.ownerId)));
+app.post('/api/handover-requests', auth, async (req, res) => {
+  try {
+    if (req.isMock) return res.status(403).json({ message: 'Handover requests are disabled in mock mode.' });
+    const recipientEmail = String(req.body?.recipientEmail || '').trim().toLowerCase();
+    const repoFullName = String(req.body?.repoFullName || '').trim();
+    if (!/^\\S+@\\S+\\.\\S+$/.test(recipientEmail) || !repoFullName) return res.status(400).json({ message: 'Enter a recipient account email and repository.' });
+    const recipient = await findUserByEmail(recipientEmail);
+    if (!recipient) return res.status(404).json({ message: 'No NEXORA account found for this email. Ask them to create an account first.' });
+    if (String(recipient._id) === req.ownerId) return res.status(400).json({ message: 'You cannot send a handover request to yourself.' });
+    const requester = await findUserById(req.ownerId);
+    const request = await insertOwned('handoverRequests', req.ownerId, { requesterId: req.ownerId, requesterEmail: requester?.email || '', requesterName: requester?.name || 'NEXORA member', recipientId: String(recipient._id), recipientEmail, recipientName: recipient.name || 'NEXORA member', repoFullName, reportId: req.body?.reportId || null, message: String(req.body?.message || '').slice(0,1000), status: 'pending' });
+    await createNotification(String(recipient._id), { title: 'New repository handover request', message: (requester?.name || requester?.email || 'A teammate') + ' requested a handover for ' + repoFullName + '.', type: 'handover_request', action: 'view_request', requestId: request._id, fromUserId: req.ownerId, fromEmail: requester?.email, status: 'pending' });
+    res.status(201).json(request);
+  } catch (error) { res.status(500).json({ message: error.message || 'Could not create handover request.' }); }
+});
+app.patch('/api/handover-requests/:id/respond', auth, async (req, res) => {
+  const action = String(req.body?.action || '');
+  if (!['accepted','rejected'].includes(action)) return res.status(400).json({ message: 'Choose accept or reject.' });
+  const request = (await listHandoverForUser(req.ownerId)).find(r => String(r._id) === req.params.id);
+  if (!request || request.recipientId !== req.ownerId) return res.status(404).json({ message: 'Request not found for this account.' });
+  if (request.status !== 'pending') return res.status(409).json({ message: 'This request has already been responded to.' });
+  const updated = await updateOwned('handoverRequests', request._id, request.requesterId, { status: action, respondedAt: new Date().toISOString() });
+  const currentUser = await findUserById(req.ownerId);
+  await createNotification(request.requesterId, { title: action === 'accepted' ? 'Handover request accepted' : 'Handover request rejected', message: (currentUser?.name || currentUser?.email || 'The recipient') + ' ' + action + ' your handover request for ' + request.repoFullName + '.', type: 'handover_status', requestId: request._id, status: action });
+  res.json(updated);
+});
+app.patch('/api/handover-requests/:id/complete', auth, async (req, res) => {
+  const request = (await listHandoverForUser(req.ownerId)).find(r => String(r._id) === req.params.id);
+  if (!request || ![request.requesterId, request.recipientId].includes(req.ownerId)) return res.status(404).json({ message: 'Request not found for this account.' });
+  if (request.status !== 'accepted') return res.status(409).json({ message: 'Only accepted requests can be completed.' });
+  const updated = await updateOwned('handoverRequests', request._id, request.requesterId, { status: 'completed', completedAt: new Date().toISOString() });
+  const otherId = req.ownerId === request.requesterId ? request.recipientId : request.requesterId;
+  const currentUser = await findUserById(req.ownerId);
+  await createNotification(otherId, { title: 'Handover completed', message: (currentUser?.name || 'A teammate') + ' marked the handover for ' + request.repoFullName + ' complete.', type: 'handover_status', requestId: request._id, status: 'completed' });
+  res.json(updated);
+});
+
 app.get('/api/workspace', auth, async (req, res) => {
-  const [projects, reports, sources, risks] = await Promise.all(['projects','reports','sources','risks'].map(c => listOwned(c, req.ownerId)));
+  const [projects, reports, sources, risks, notifications, handoverRequests] = await Promise.all([...['projects','reports','sources','risks','notifications'].map(c => listOwned(c, req.ownerId)), listHandoverForUser(req.ownerId)]);
   const user = req.isMock ? { id: 'mock-workspace', name: 'Demo Workspace', email: 'demo@nexora.local', role: 'administrator', githubConnected: false } : safeUser(await findUserById(req.ownerId));
-  res.json({ user, mode: req.isMock ? 'mock' : 'account', storage: storageMode(req.ownerId), projects, reports, sources, risks: risks.filter(r => !r.resolved), ai: { provider: process.env.GROQ_API_KEY ? 'Groq API' : 'Structured evidence fallback', model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b', configured: Boolean(process.env.GROQ_API_KEY) }, features: { github: !req.isMock } });
+  res.json({ user, mode: req.isMock ? 'mock' : 'account', storage: storageMode(req.ownerId), projects, reports, sources, risks: risks.filter(r => !r.resolved), notifications, handoverRequests, ai: { provider: process.env.GROQ_API_KEY ? 'Groq API' : 'Structured evidence fallback', model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b', configured: Boolean(process.env.GROQ_API_KEY) }, features: { github: !req.isMock } });
 });
 app.post('/api/projects', auth, async (req, res) => {
   if (!req.body?.name?.trim()) return res.status(400).json({ message: 'Project name is required.' });
