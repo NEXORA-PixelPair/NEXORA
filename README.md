@@ -176,6 +176,21 @@ When `MONGO_URI` is blank, real account data is persisted in `server/data/nexora
 - The current local development configuration is suitable for a prototype/demo. Before production deployment, add HTTPS, secure cookie-based sessions, CSRF protection, account recovery/email verification, audit logs, rate limiting, OAuth token rotation/revocation, stricter CORS, encrypted database backups and a security review.
 - Never place `.env` files, OAuth credentials, API keys or access tokens in GitHub.
 
+## Real-time notifications and repository handovers
+
+- Signed-in users can send a handover request to another NEXORA account by email and repository name.
+- Recipients receive a notification and can accept or reject the request. The sender receives a status update.
+- Accepted handovers can be marked completed; the other participant is notified.
+- The Notifications page keeps per-account history, unread counts and read/mark-all-read controls.
+- Important workspace activity (project/source creation and pass-on report generation/approval) is recorded.
+- The client refreshes notification data every 15 seconds while signed in. Notifications and requests are account-scoped and persisted in JSON or MongoDB.
+- Mock database mode does not support sending handover requests.
+
+New API routes:
+- `GET /api/notifications`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all`
+- `GET /api/handover-requests`, `POST /api/handover-requests`
+- `PATCH /api/handover-requests/:id/respond`, `PATCH /api/handover-requests/:id/complete`
+
 ## Main routes
 
 - `POST /api/auth/register` — create email/password account
