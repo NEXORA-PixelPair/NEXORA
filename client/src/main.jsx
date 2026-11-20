@@ -504,7 +504,7 @@ function LoginScreen({ authTab, setAuthTab, form, setForm, onSubmit, onGoogle, o
           <button type="button" onClick={onGoogle} aria-label="Continue with Google"><GoogleMark/></button>
         </div>
         {notice && <div className="login-alert"><AlertTriangle size={15}/>{notice}</div>}
-        {authTab === 'register' && <button type="button" className="reference-back-login" onClick={() => setAuthTab('login')}>Already have an account? Sign in</button>}
+        {authTab === 'register' ? <button type="button" className="reference-back-login" onClick={() => setAuthTab('login')}>Already have an account? Sign in</button> : <button type="button" className="reference-back-login" onClick={() => setAuthTab('register')}>Don’t have an account? <strong>Create Account / Sign Up</strong></button>}
       </div>
     </section>
 
