@@ -1569,3 +1569,13 @@ h1,h2,h3,h4,.page-heading h1,.banner-copy h2,.brand-wordmark,.sidebar{font-famil
 .sidebar .account-copy b{color:#fff!important;font-family:'Outfit',sans-serif!important;font-size:20px!important;font-weight:800!important;letter-spacing:-.025em!important;line-height:1.15!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sidebar .account-copy small{color:#c9e8f4!important;font-size:12px!important;letter-spacing:.015em!important;font-weight:600!important;line-height:1.35!important;white-space:normal;}
 .sidebar .account-scope-dot{position:relative;z-index:1;margin-left:auto;flex-shrink:0;width:9px;height:9px;border-radius:50%;background:#55f4d8;box-shadow:0 0 10px rgba(85,244,216,.7);}
+
+
+/* Account card: larger footprint with softer pastel rainbow */
+.sidebar .account-strip{min-height:132px!important;padding:22px 22px!important;gap:17px!important;border-radius:24px!important;background:linear-gradient(110deg,rgba(70,225,210,.78),rgba(100,190,255,.78) 36%,rgba(165,150,255,.76) 68%,rgba(230,150,225,.76))!important;box-shadow:0 10px 28px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.28)!important;}
+.sidebar .account-strip:before{background:linear-gradient(110deg,rgba(255,255,255,.13),rgba(255,255,255,.03) 55%,rgba(255,255,255,.09))!important;}
+.sidebar .account-strip:after{opacity:.45!important;}
+.sidebar .account-avatar{width:72px!important;height:72px!important;min-width:72px!important;border-radius:21px!important;font-size:30px!important;background:linear-gradient(145deg,rgba(20,170,165,.92),rgba(12,135,145,.92))!important;box-shadow:0 0 0 1px rgba(255,255,255,.3),0 8px 18px rgba(0,0,0,.15)!important;}
+.sidebar .account-copy b{font-size:24px!important;color:#fff!important;}
+.sidebar .account-copy small{font-size:14px!important;color:rgba(255,255,255,.88)!important;letter-spacing:.025em!important;}
+.sidebar .account-scope-dot{background:#e8fffb!important;box-shadow:0 0 9px rgba(255,255,255,.65)!important;}
