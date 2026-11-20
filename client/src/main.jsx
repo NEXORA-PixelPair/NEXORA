@@ -48,7 +48,12 @@ function App() {
   async function api(path, options = {}) {
     const response = await fetch(`${API}${path}`, { ...options, headers: { ...headers(), ...(options.headers || {}) } });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body.message || `Request failed (${response.status})`);
+    if (!response.ok) {
+      if (response.status === 404 && !body.message) {
+        throw new Error('Handover API not found on the live backend (404). The backend deployment is outdated; redeploy the server from the suhani branch.');
+      }
+      throw new Error(body.message || `Request failed (${response.status})`);
+    }
     return body;
   }
   function resetAccountScopedState() {
