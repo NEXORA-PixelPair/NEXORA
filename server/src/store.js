@@ -74,13 +74,13 @@ export async function initStore() {
   } else {
     try { fileDb = JSON.parse(await fs.readFile(filePath, 'utf8')); }
     catch { fileDb = { users: [], projects: [], reports: [], sources: [], risks: [] }; await persist(); }
-    for (const key of ['users', 'projects', 'reports', 'sources', 'risks', 'notifications']) fileDb[key] ||= [];
+    for (const key of ['users', 'projects', 'reports', 'sources', 'risks', 'notifications', 'handoverRequests']) fileDb[key] ||= [];
     console.log('NEXORA using persistent local JSON storage for real accounts');
   }
   // Keep demonstration data isolated from real account storage, even when MongoDB is enabled.
   try { mockDb = JSON.parse(await fs.readFile(mockFilePath, 'utf8')); }
   catch { mockDb = demoSeed(); await persistMock(); }
-  for (const key of ['users', 'projects', 'reports', 'sources', 'risks', 'notifications']) mockDb[key] ||= [];
+  for (const key of ['users', 'projects', 'reports', 'sources', 'risks', 'notifications', 'handoverRequests']) mockDb[key] ||= [];
 }
 
 export function storageMode(ownerId = null) {
@@ -154,4 +154,9 @@ export async function deleteOwned(collection, id, ownerId) {
   if (index < 0) return null; const [removed] = target[collection].splice(index, 1);
   if (isMockOwner(ownerId)) await persistMock(); else await persist();
   return removed;
+}
+
+export async function listHandoverForUser(userId) {
+  if (mongoReady) return models.HandoverRequest.find({ $or: [{ requesterId: userId }, { recipientId: userId }] }).sort({ createdAt: -1 }).lean();
+  return fileDb.handoverRequests.filter(r => r.requesterId === userId || r.recipientId === userId).sort((a,b) => new Date(b.createdAt||0)-new Date(a.createdAt||0));
 }
