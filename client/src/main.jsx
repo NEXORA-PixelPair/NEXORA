@@ -38,14 +38,22 @@ function App() {
   const [reconstructionBusy, setReconstructionBusy] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('nexora_theme') || 'dark');
-  const [profileOpen, setProfileOpen] = useState(false);\n  const [notifications, setNotifications] = useState([]);\n  const [handoverRequests, setHandoverRequests] = useState([]);\n  const [handoverForm, setHandoverForm] = useState({ recipientEmail: '', repoFullName: '', message: '' });
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [handoverRequests, setHandoverRequests] = useState([]);
+  const [handoverForm, setHandoverForm] = useState({ recipientEmail: '', repoFullName: '', message: '' });
   const profileMenuRef = useRef(null);
 
   const headers = () => ({ 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) });
   async function api(path, options = {}) {
     const response = await fetch(`${API}${path}`, { ...options, headers: { ...headers(), ...(options.headers || {}) } });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body.message || `Request failed (${response.status})`);
+    if (!response.ok) {
+      if (response.status === 404 && !body.message) {
+        throw new Error('Handover API not found on the live backend (404). The backend deployment is outdated; redeploy the server from the suhani branch.');
+      }
+      throw new Error(body.message || `Request failed (${response.status})`);
+    }
     return body;
   }
   function resetAccountScopedState() {
@@ -265,7 +273,8 @@ function App() {
     { label: 'Overview', icon: LayoutDashboard, group: 'Workspace' },
     { label: 'Projects', icon: FolderKanban, group: 'Workspace' },
     ...(!isMock ? [{ label: 'Repositories', icon: Github, group: 'Workspace' }] : []),
-    { label: 'Pass-on reports', icon: FileCheck2, group: 'Workspace' },\n    { label: 'Notifications', icon: Bell, group: 'Workspace' },
+    { label: 'Pass-on reports', icon: FileCheck2, group: 'Workspace' },
+    { label: 'Notifications', icon: Bell, group: 'Workspace' },
     { label: 'Project intelligence', icon: BookOpen, group: 'Intelligence' },
     { label: 'Knowledge radar', icon: Target, group: 'Intelligence' },
     { label: 'AI assistant', icon: Bot, group: 'Intelligence' },
@@ -283,7 +292,8 @@ function App() {
     <main className="main-area">
       <header className="topbar"><button className="icon-button mobile-trigger" onClick={() => setMobileNav(true)}><Menu/></button><div className="breadcrumbs"><span>Workspace</span><ChevronRight size={15}/><b>{page}</b></div><div className="topbar-right"><span className={`mode-pill ${isMock ? 'mock-pill' : ''}`}><i/>{isMock ? 'MOCK DATABASE' : 'PRIVATE WORKSPACE'}</span><button className="icon-button refresh-button" onClick={refresh} title="Refresh workspace"><RefreshCw size={17}/></button><div className="profile-menu-wrap" ref={profileMenuRef}><button className="profile-trigger" aria-label="Open profile menu" aria-expanded={profileOpen} onClick={() => setProfileOpen(open => !open)}><span className="top-user">{(user?.name || 'N').slice(0,1).toUpperCase()}</span><ChevronDown size={15}/></button>{profileOpen && <div className="profile-menu" role="menu"><div className="profile-menu-identity"><b>{user?.name || 'NEXORA User'}</b><small>{user?.email || 'Demo workspace'}</small><span>{isMock ? 'Mock database' : 'Private account'}</span></div><div className="profile-menu-divider"/><div className="profile-menu-label">Appearance</div><div className="theme-options"><button className={theme === 'dark' ? 'theme-option selected' : 'theme-option'} onClick={() => setTheme('dark')}><Moon size={15}/> Dark</button><button className={theme === 'light' ? 'theme-option selected' : 'theme-option'} onClick={() => setTheme('light')}><Sun size={15}/> Light</button></div><div className="profile-menu-divider"/><button className="profile-logout" role="menuitem" onClick={signOut}><LogOut size={16}/> Log out</button></div>}</div></div></header>
       <div className="page-container">
-        {page === 'Notifications' && <NotificationsPage notifications={notifications} requests={handoverRequests} userId={user?.id} form={handoverForm} setForm={setHandoverForm} onSend={sendHandoverRequest} onRead={markNotificationRead} onReadAll={markAllNotificationsRead} onRespond={respondHandover} onComplete={completeHandover} busy={busy} isMock={isMock}/> }\n        {page === 'Overview' && <OverviewPage user={user} isMock={isMock} projects={projects} reports={reports} risks={risks} onPage={setPage} githubStatus={githubStatus}/>}
+        {page === 'Notifications' && <NotificationsPage notifications={notifications} requests={handoverRequests} userId={user?.id} form={handoverForm} setForm={setHandoverForm} onSend={sendHandoverRequest} onRead={markNotificationRead} onReadAll={markAllNotificationsRead} onRespond={respondHandover} onComplete={completeHandover} busy={busy} isMock={isMock}/> }
+        {page === 'Overview' && <OverviewPage user={user} isMock={isMock} projects={projects} reports={reports} risks={risks} onPage={setPage} githubStatus={githubStatus}/>}
         {page === 'Projects' && <ProjectsPage projects={projects} onCreate={createProject} form={projectForm} setForm={setProjectForm} busy={busy}/>}
         {page === 'Repositories' && !isMock && <RepositoriesPage connected={githubStatus.connected} login={githubStatus.login} repos={repositoryList} filtered={filteredRepos} search={repoSearch} setSearch={setRepoSearch} onConnect={startGithubConnect} onLoad={loadRepositories} onReport={generateReport} busy={busy} notice={notice}/>}
         {page === 'Pass-on reports' && <ReportsPage reports={reports} selected={selectedReport} onOpen={openReport} onClear={() => setSelectedReport(null)} onApprove={approveReport}/>}
