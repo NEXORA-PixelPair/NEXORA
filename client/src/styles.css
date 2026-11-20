@@ -1142,3 +1142,26 @@ button:not(:disabled):active{transform:scale(.98)}
 @keyframes chipPulse{0%,100%{transform:translateY(0);filter:brightness(1)}50%{transform:translateY(-5px);filter:brightness(1.16)}}
 @keyframes dashboardCardIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.overview-banner:before,.banner-copy>*,.banner-graphic,.graphic-ring,.graphic-core,.graphic-chip,.stat-card,.project-preview,.next-step-strip{animation:none!important;transition:none!important}}
+
+
+/* Overview page: visible ambient motion across the whole dashboard */
+.welcome-block{animation:overviewWelcomeIn .9s cubic-bezier(.18,.8,.2,1) both}
+.welcome-block .live-dot{animation:overviewLivePulse 2.4s ease-in-out infinite}
+.overview-banner{position:relative;overflow:hidden}
+.overview-banner:after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.18;background-image:radial-gradient(circle,rgba(120,255,230,.7) 1px,transparent 1.8px),radial-gradient(circle,rgba(241,223,183,.45) 1px,transparent 2px);background-size:54px 54px,91px 91px;background-position:0 0,22px 13px;animation:overviewParticles 26s linear infinite}
+.overview-banner .banner-copy,.overview-banner .banner-graphic{position:relative;z-index:1}
+.graphic-ring{filter:drop-shadow(0 0 5px rgba(68,220,199,.16))}
+.graphic-ring:before{content:'';position:absolute;inset:0;border-radius:inherit;animation:ringBreath 5.5s ease-in-out infinite}
+.ring-2:before{animation-delay:1.2s}
+.graphic-core img{animation:markGlow 3.8s ease-in-out infinite}
+.overview-lower .section-title-row{animation:overviewWelcomeIn .75s .2s both}
+.project-preview-grid .project-preview{animation:dashboardCardIn .75s cubic-bezier(.2,.8,.2,1) both}
+.project-preview-grid .project-preview:nth-child(2){animation-delay:.13s}
+.project-preview-grid .project-preview:nth-child(3){animation-delay:.26s}
+.next-step-strip{animation-delay:.35s}
+@keyframes overviewWelcomeIn{from{opacity:0;transform:translateY(18px);filter:blur(3px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes overviewLivePulse{0%,100%{box-shadow:0 0 0 0 rgba(64,220,194,.25)}50%{box-shadow:0 0 0 5px rgba(64,220,194,.08)}}
+@keyframes overviewParticles{from{background-position:0 0,22px 13px;transform:translateY(0)}to{background-position:-90px -120px,80px -60px;transform:translateY(-1%)}}
+@keyframes ringBreath{0%,100%{opacity:.15;transform:scale(.98)}50%{opacity:.5;transform:scale(1.025)}}
+@keyframes markGlow{0%,100%{filter:drop-shadow(0 0 4px rgba(59,234,214,.2))}50%{filter:drop-shadow(0 0 12px rgba(59,234,214,.5))}}
+@media(prefers-reduced-motion:reduce){.welcome-block,.welcome-block .live-dot,.overview-banner:after,.graphic-ring:before,.graphic-core img,.overview-lower .section-title-row,.project-preview-grid .project-preview{animation:none!important}}
