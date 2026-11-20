@@ -983,3 +983,27 @@ a,button,[role=button],input[type=checkbox],select{cursor:url("data:image/svg+xm
 .bot-mini-message{font-size:13px}
 .nexora-bot-panel form input{font-size:13px}
 @media(max-width:600px){.nexora-float-bot{top:12px;right:12px;bottom:auto}.nexora-bot-panel{height:min(470px,calc(100vh - 80px))}}
+
+/* Lower floating AI widget to clear topbar controls; add subtle live motion */
+.nexora-float-bot{top:94px!important;right:22px!important}
+.nexora-bot-orb{animation:bot-float 4.8s ease-in-out infinite,bot-glow-pulse 3.2s ease-in-out infinite}
+.nexora-bot-orb:hover{animation-play-state:paused}
+.bot-orb-glow{animation:orbit-spin 7s linear infinite,bot-glow-breathe 2.8s ease-in-out infinite}
+.nexora-bot-orb i{animation:bot-online-pulse 2s ease-in-out infinite}
+.nexora-bot-panel{animation:bot-panel-in .3s cubic-bezier(.2,.8,.2,1) both}
+.nexora-bot-panel>header .bot-avatar{animation:bot-avatar-breathe 4s ease-in-out infinite}
+.page-container>*{animation:live-page-enter .5s cubic-bezier(.2,.8,.2,1) both}
+.page-container>*:nth-child(2){animation-delay:.05s}
+.page-container>*:nth-child(3){animation-delay:.1s}
+.page-container>*:nth-child(4){animation-delay:.15s}
+.app-frame:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.12;background:radial-gradient(circle at 12% 18%,rgba(43,167,154,.15),transparent 24%),radial-gradient(circle at 85% 75%,rgba(255,120,104,.1),transparent 28%);animation:ambient-shift 16s ease-in-out infinite alternate}
+.main-area,.sidebar,.nexora-float-bot,.toast{position:relative;z-index:1}
+@keyframes bot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes bot-glow-pulse{0%,100%{box-shadow:0 0 0 5px rgba(43,167,154,.06),0 10px 30px rgba(0,0,0,.3),0 0 18px rgba(43,167,154,.16)}50%{box-shadow:0 0 0 8px rgba(43,167,154,.08),0 10px 30px rgba(0,0,0,.3),0 0 32px rgba(43,167,154,.3)}}
+@keyframes bot-glow-breathe{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes bot-online-pulse{0%,100%{box-shadow:0 0 7px #7de1b5}50%{box-shadow:0 0 14px #7de1b5,0 0 22px rgba(125,225,181,.45)}}
+@keyframes bot-avatar-breathe{0%,100%{filter:drop-shadow(0 0 3px rgba(43,167,154,.15))}50%{filter:drop-shadow(0 0 10px rgba(43,167,154,.35))}}
+@keyframes live-page-enter{from{opacity:.65;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ambient-shift{from{transform:translate3d(-1%,0,0)}to{transform:translate3d(1%,2%,0)}}
+@media(max-width:600px){.nexora-float-bot{top:84px!important;right:12px!important;bottom:auto!important}}
+@media(prefers-reduced-motion:reduce){.nexora-bot-orb,.bot-orb-glow,.nexora-bot-orb i,.app-frame:before{animation:none!important}}
