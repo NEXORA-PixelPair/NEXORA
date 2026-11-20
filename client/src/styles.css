@@ -892,3 +892,6 @@ body{background:#001317;color:var(--offwhite)}
 .activity-empty b{color:var(--offwhite)}
 .activity-empty p{margin:0;font-size:12px}
 @media(max-width:620px){.activity-panel{padding:15px}.activity-panel-head{gap:10px}.activity-stats{grid-template-columns:1fr}.activity-stats>div{padding:10px 12px}.activity-item{padding:11px;gap:9px}.activity-icon{width:32px;height:32px;flex-basis:32px}}
+
+/* Multi-repository management */
+.repo-management-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 15px;margin:0 0 16px;background:var(--panel,#292f32);border:1px solid var(--line);border-radius:13px}.repo-management-bar>span{color:var(--muted,#9aa6a0);font-size:12px;margin-right:auto}.repo-select-all,.repo-select{display:flex;align-items:center;gap:7px;color:var(--offwhite);font-size:12px;cursor:pointer}.repo-select input,.repo-select-all input{accent-color:#2ba79a;width:16px;height:16px}.repo-card-selected{border-color:#2ba79a;box-shadow:0 0 0 1px rgba(43,167,154,.2)}.repo-card-top .repo-select{background:rgba(43,167,154,.12);padding:6px 9px;border-radius:8px}.repo-card-top{gap:10px}
