@@ -1601,11 +1601,3 @@ h1,h2,h3,h4,.page-heading h1,.banner-copy h2,.brand-wordmark,.sidebar{font-famil
 .pixel-intro .pixel-intro-content,.pixel-intro .pixel-intro-phases,.pixel-intro .pixel-ribbon-track,.pixel-intro .pixel-intro-progress,.pixel-intro .pixel-intro-skip{position:relative;z-index:2;}
 @keyframes landingParticlesFloat{0%{transform:translate3d(0,0,0) rotate(0deg)}50%{transform:translate3d(-24px,-35px,0) rotate(2deg)}100%{transform:translate3d(0,-75px,0) rotate(0deg)}}
 @media(prefers-reduced-motion:reduce){.pixel-intro:after{animation:none!important}}
-
-
-/* Dashboard background: subtle floating particles (not the intro screen) */
-.app-frame{position:relative;isolation:isolate;}
-.app-frame:after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle,rgba(115,225,255,.28) 1px,transparent 2px),radial-gradient(circle,rgba(180,145,255,.22) 1px,transparent 2px),radial-gradient(circle,rgba(120,255,225,.18) 1px,transparent 2px);background-size:91px 91px,137px 137px,181px 181px;background-position:12px 18px,61px 43px,100px 8px;opacity:.42;animation:dashboardParticlesFloat 38s ease-in-out infinite;}
-.app-frame>*{position:relative;z-index:1;}
-@keyframes dashboardParticlesFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-18px,-24px,0)}}
-@media(prefers-reduced-motion:reduce){.app-frame:after{animation:none!important}}
