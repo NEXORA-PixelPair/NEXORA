@@ -1558,3 +1558,14 @@ h1,h2,h3,h4,.page-heading h1,.banner-copy h2,.brand-wordmark,.sidebar{font-famil
 .app-frame{grid-template-columns:340px minmax(0,1fr)!important;}
 .sidebar{width:340px!important;padding-left:22px!important;padding-right:22px!important;}
 @media(max-width:1100px){.app-frame{grid-template-columns:1fr!important}.sidebar{width:340px!important;}}
+
+
+/* Sidebar account card: clearer, high-contrast and uncluttered */
+.sidebar .account-strip{position:relative;display:flex;align-items:center;gap:14px;padding:16px 18px!important;min-height:104px;border-radius:22px!important;background:linear-gradient(115deg,rgba(5,74,78,.96),rgba(12,50,79,.96) 58%,rgba(50,35,78,.96))!important;border:1px solid rgba(91,238,225,.32)!important;box-shadow:0 12px 30px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.1)!important;overflow:hidden;}
+.sidebar .account-strip:before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,rgba(36,235,211,.1),transparent 50%,rgba(167,103,255,.12));}
+.sidebar .account-strip:after{content:'';position:absolute;right:-40px;top:-48px;width:140px;height:140px;border-radius:50%;border:1px solid rgba(115,208,255,.13);box-shadow:0 0 0 18px rgba(115,208,255,.025),0 0 0 38px rgba(115,208,255,.02);pointer-events:none;}
+.sidebar .account-avatar{position:relative;z-index:1;width:58px!important;height:58px!important;min-width:58px!important;border-radius:17px!important;display:grid;place-items:center;background:linear-gradient(145deg,#17b8b2,#087a86)!important;color:#f5ffff!important;font-family:'Outfit',sans-serif!important;font-size:25px!important;font-weight:800!important;box-shadow:0 0 0 1px rgba(134,255,242,.28),0 7px 18px rgba(0,0,0,.2)!important;}
+.sidebar .account-copy{position:relative;z-index:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+.sidebar .account-copy b{color:#fff!important;font-family:'Outfit',sans-serif!important;font-size:20px!important;font-weight:800!important;letter-spacing:-.025em!important;line-height:1.15!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar .account-copy small{color:#c9e8f4!important;font-size:12px!important;letter-spacing:.015em!important;font-weight:600!important;line-height:1.35!important;white-space:normal;}
+.sidebar .account-scope-dot{position:relative;z-index:1;margin-left:auto;flex-shrink:0;width:9px;height:9px;border-radius:50%;background:#55f4d8;box-shadow:0 0 10px rgba(85,244,216,.7);}
