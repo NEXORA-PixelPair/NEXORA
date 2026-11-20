@@ -4,7 +4,7 @@ import {
   Activity, ArrowRight, ArrowUpRight, Eye, EyeOff, Mail, BookOpen, Bot, Check, ChevronRight, ChevronDown, CircleHelp,
   Code2, Database, FileCheck2, FileText, FolderKanban, Github, Lightbulb, Rocket,
   LayoutDashboard, LockKeyhole, LogOut, Menu, Moon, Sun, Plus, RefreshCw, Search, Send,
-  Settings, ShieldCheck, Sparkles, Target, Users, X, AlertTriangle
+  Settings, ShieldCheck, Sparkles, Target, Users, X, AlertTriangle, Bell
 } from 'lucide-react';
 import './styles.css';
 
@@ -38,7 +38,7 @@ function App() {
   const [reconstructionBusy, setReconstructionBusy] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('nexora_theme') || 'dark');
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);\n  const [notifications, setNotifications] = useState([]);\n  const [handoverRequests, setHandoverRequests] = useState([]);\n  const [handoverForm, setHandoverForm] = useState({ recipientEmail: '', repoFullName: '', message: '' });
   const profileMenuRef = useRef(null);
 
   const headers = () => ({ 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) });
@@ -55,7 +55,7 @@ function App() {
     setSelectedReport(null); setQuestion(''); setChat([WELCOME_CHAT]); setSources([]);
     setSourceForm({ name: '', content: '', type: 'Project document' }); setAnalysisResult(null); setAnalysisBusy(false); setReconstruction(null); setReconstructionBusy(false); setProjectForm({ name: '', description: '' });
     setAuthForm({ name: '', email: '', password: '' }); setAuthTab('login'); setBusy(false);
-    setProfileOpen(false); setMobileNav(false);
+    setProfileOpen(false); setMobileNav(false); setNotifications([]); setHandoverRequests([]);
   }
   function establishSession(result) {
     resetAccountScopedState();
@@ -138,6 +138,41 @@ function App() {
   }
   function signOut() { localStorage.removeItem('nexora_token'); setToken(''); resetAccountScopedState(); setNotice('You have been signed out.'); }
   async function refresh() { try { await loadWorkspace(); } catch (error) { setNotice(error.message); } }
+  async function refreshNotificationData(activeToken = token) {
+    if (!activeToken || localStorage.getItem('nexora_token') !== activeToken) return;
+    try {
+      const [n, h] = await Promise.all([
+        fetch(`${API}/notifications`, { headers: { Authorization: `Bearer ${activeToken}` } }).then(r => r.ok ? r.json() : []),
+        fetch(`${API}/handover-requests`, { headers: { Authorization: `Bearer ${activeToken}` } }).then(r => r.ok ? r.json() : [])
+      ]);
+      if (localStorage.getItem('nexora_token') !== activeToken) return;
+      setNotifications(n || []); setHandoverRequests(h || []);
+    } catch {}
+  }
+  async function sendHandoverRequest(event) {
+    event.preventDefault(); setBusy(true);
+    try {
+      await api('/handover-requests', { method: 'POST', body: JSON.stringify(handoverForm) });
+      setHandoverForm({ recipientEmail: '', repoFullName: '', message: '' });
+      await refreshNotificationData(); setNotice('Handover request sent.'); 
+    } catch (error) { setNotice(error.message); } finally { setBusy(false); }
+  }
+  async function respondHandover(id, action) {
+    try { await api(`/handover-requests/${id}/respond`, { method: 'PATCH', body: JSON.stringify({ action }) }); await refreshNotificationData(); setNotice(`Request ${action}.`); }
+    catch (error) { setNotice(error.message); }
+  }
+  async function completeHandover(id) {
+    try { await api(`/handover-requests/${id}/complete`, { method: 'PATCH', body: '{}' }); await refreshNotificationData(); setNotice('Handover marked complete.'); }
+    catch (error) { setNotice(error.message); }
+  }
+  async function markNotificationRead(id) {
+    try { await api(`/notifications/${id}/read`, { method: 'PATCH', body: '{}' }); await refreshNotificationData(); }
+    catch (error) { setNotice(error.message); }
+  }
+  async function markAllNotificationsRead() {
+    try { await api('/notifications/read-all', { method: 'PATCH', body: '{}' }); await refreshNotificationData(); }
+    catch (error) { setNotice(error.message); }
+  }
   async function createProject(event) {
     event.preventDefault(); setBusy(true);
     try { await api('/projects', { method: 'POST', body: JSON.stringify(projectForm) }); setProjectForm({ name: '', description: '' }); await refresh(); setPage('Projects'); setNotice('Project created.'); }
@@ -224,7 +259,7 @@ function App() {
     { label: 'Overview', icon: LayoutDashboard, group: 'Workspace' },
     { label: 'Projects', icon: FolderKanban, group: 'Workspace' },
     ...(!isMock ? [{ label: 'Repositories', icon: Github, group: 'Workspace' }] : []),
-    { label: 'Pass-on reports', icon: FileCheck2, group: 'Workspace' },
+    { label: 'Pass-on reports', icon: FileCheck2, group: 'Workspace' },\n    { label: 'Notifications', icon: Bell, group: 'Workspace' },
     { label: 'Project intelligence', icon: BookOpen, group: 'Intelligence' },
     { label: 'Knowledge radar', icon: Target, group: 'Intelligence' },
     { label: 'AI assistant', icon: Bot, group: 'Intelligence' },
@@ -236,13 +271,13 @@ function App() {
     <aside className={`sidebar ${mobileNav ? 'sidebar-open' : ''}`}>
       <div className="brand-row"><div className="sidebar-brand-lockup"><img src="/brand/nexora-mark.png" alt=""/><strong>NEXORA</strong></div><button className="icon-button sidebar-close" onClick={() => setMobileNav(false)}><X size={18}/></button></div>
       <div className="workspace-tag"><span className="workspace-avatar">{(user?.name || 'N').slice(0,1).toUpperCase()}</span><div><b>{isMock ? 'Demo workspace' : user?.name}</b><small>{isMock ? 'Mock database' : 'Private account space'}</small></div></div>
-      {['Workspace','Intelligence','Manage'].map(group => <div className="nav-group" key={group}><div className="nav-caption">{group}</div>{navigation.filter(item => item.group === group).map(item => <button className={`nav-link ${page === item.label ? 'active' : ''}`} key={item.label} onClick={() => { setPage(item.label); setMobileNav(false); }}><item.icon size={19}/><span>{item.label}</span>{item.label === 'Pass-on reports' && reports.length > 0 && <i className="nav-number">{reports.length}</i>}</button>)}</div>)}
+      {['Workspace','Intelligence','Manage'].map(group => <div className="nav-group" key={group}><div className="nav-caption">{group}</div>{navigation.filter(item => item.group === group).map(item => <button className={`nav-link ${page === item.label ? 'active' : ''}`} key={item.label} onClick={() => { setPage(item.label); setMobileNav(false); }}><item.icon size={19}/><span>{item.label}</span>{item.label === 'Notifications' && notifications.filter(n => !n.read).length > 0 && <i className="nav-number">{notifications.filter(n => !n.read).length}</i>}{item.label === 'Pass-on reports' && reports.length > 0 && <i className="nav-number">{reports.length}</i>}</button>)}</div>)}
       <div className="sidebar-bottom"><div className="continuity-note"><div className="note-icon"><Sparkles size={18}/></div><h3>Knowledge should outlive a role.</h3><p>Keep decisions, context and next steps connected to evidence.</p><button onClick={() => setPage('AI assistant')}>Talk to NEXORA <ArrowUpRight size={15}/></button></div><div className="account-strip"><div className="account-avatar">{(user?.name || 'N').slice(0,1).toUpperCase()}</div><div className="account-copy"><b>{user?.name || 'NEXORA User'}</b><small>{isMock ? 'Demo session' : user?.email}</small></div><span className="account-scope-dot" title="Account-scoped workspace"/></div></div>
     </aside>
     <main className="main-area">
       <header className="topbar"><button className="icon-button mobile-trigger" onClick={() => setMobileNav(true)}><Menu/></button><div className="breadcrumbs"><span>Workspace</span><ChevronRight size={15}/><b>{page}</b></div><div className="topbar-right"><span className={`mode-pill ${isMock ? 'mock-pill' : ''}`}><i/>{isMock ? 'MOCK DATABASE' : 'PRIVATE WORKSPACE'}</span><button className="icon-button refresh-button" onClick={refresh} title="Refresh workspace"><RefreshCw size={17}/></button><div className="profile-menu-wrap" ref={profileMenuRef}><button className="profile-trigger" aria-label="Open profile menu" aria-expanded={profileOpen} onClick={() => setProfileOpen(open => !open)}><span className="top-user">{(user?.name || 'N').slice(0,1).toUpperCase()}</span><ChevronDown size={15}/></button>{profileOpen && <div className="profile-menu" role="menu"><div className="profile-menu-identity"><b>{user?.name || 'NEXORA User'}</b><small>{user?.email || 'Demo workspace'}</small><span>{isMock ? 'Mock database' : 'Private account'}</span></div><div className="profile-menu-divider"/><div className="profile-menu-label">Appearance</div><div className="theme-options"><button className={theme === 'dark' ? 'theme-option selected' : 'theme-option'} onClick={() => setTheme('dark')}><Moon size={15}/> Dark</button><button className={theme === 'light' ? 'theme-option selected' : 'theme-option'} onClick={() => setTheme('light')}><Sun size={15}/> Light</button></div><div className="profile-menu-divider"/><button className="profile-logout" role="menuitem" onClick={signOut}><LogOut size={16}/> Log out</button></div>}</div></div></header>
       <div className="page-container">
-        {page === 'Overview' && <OverviewPage user={user} isMock={isMock} projects={projects} reports={reports} risks={risks} onPage={setPage} githubStatus={githubStatus}/>}
+        {page === 'Notifications' && <NotificationsPage notifications={notifications} requests={handoverRequests} form={handoverForm} setForm={setHandoverForm} onSend={sendHandoverRequest} onRead={markNotificationRead} onReadAll={markAllNotificationsRead} onRespond={respondHandover} onComplete={completeHandover} busy={busy} isMock={isMock}/> }\n        {page === 'Overview' && <OverviewPage user={user} isMock={isMock} projects={projects} reports={reports} risks={risks} onPage={setPage} githubStatus={githubStatus}/>}
         {page === 'Projects' && <ProjectsPage projects={projects} onCreate={createProject} form={projectForm} setForm={setProjectForm} busy={busy}/>}
         {page === 'Repositories' && !isMock && <RepositoriesPage connected={githubStatus.connected} login={githubStatus.login} repos={repositoryList} filtered={filteredRepos} search={repoSearch} setSearch={setRepoSearch} onConnect={startGithubConnect} onLoad={loadRepositories} onReport={generateReport} busy={busy} notice={notice}/>}
         {page === 'Pass-on reports' && <ReportsPage reports={reports} selected={selectedReport} onOpen={openReport} onClear={() => setSelectedReport(null)} onApprove={approveReport}/>}
