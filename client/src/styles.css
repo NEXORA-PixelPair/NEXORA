@@ -1007,3 +1007,23 @@ a,button,[role=button],input[type=checkbox],select{cursor:url("data:image/svg+xm
 @keyframes ambient-shift{from{transform:translate3d(-1%,0,0)}to{transform:translate3d(1%,2%,0)}}
 @media(max-width:600px){.nexora-float-bot{top:84px!important;right:12px!important;bottom:auto!important}}
 @media(prefers-reduced-motion:reduce){.nexora-bot-orb,.bot-orb-glow,.nexora-bot-orb i,.app-frame:before{animation:none!important}}
+
+/* Header AI placement: stays in header flow, no overlap */
+.topbar-right{position:relative;display:flex;align-items:center;gap:10px}
+.topbar-right .nexora-float-bot{position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;z-index:10;flex:0 0 auto}
+.topbar-right .nexora-bot-orb{width:38px;height:38px;animation:header-bot-pulse 2.2s ease-in-out infinite;box-shadow:0 0 0 2px rgba(214,180,107,.13),0 0 14px rgba(214,180,107,.25)}
+.topbar-right .nexora-bot-orb:hover{transform:scale(1.06)}
+.topbar-right .nexora-bot-panel{position:absolute;top:48px;right:0;margin:0;transform-origin:top right;width:min(370px,calc(100vw - 22px));z-index:1300}
+@keyframes header-bot-pulse{0%,100%{box-shadow:0 0 0 2px rgba(214,180,107,.13),0 0 12px rgba(214,180,107,.2)}50%{box-shadow:0 0 0 5px rgba(214,180,107,.2),0 0 24px rgba(214,180,107,.42)}}
+/* Animated wallpaper and soft gold finishing accents */
+.app-frame{background-image:radial-gradient(ellipse at 12% 8%,rgba(214,180,107,.07),transparent 30%),radial-gradient(ellipse at 86% 82%,rgba(43,167,154,.08),transparent 35%)}
+.app-frame:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.16;background:linear-gradient(120deg,transparent 15%,rgba(214,180,107,.12) 45%,transparent 62%),radial-gradient(circle at 70% 20%,rgba(214,180,107,.12),transparent 22%);background-size:220% 220%,100% 100%;animation:gold-wallpaper-flow 22s ease-in-out infinite alternate}
+@keyframes gold-wallpaper-flow{0%{background-position:0% 40%,0 0}100%{background-position:100% 60%,100% 100%}}
+.page-container{position:relative}
+.page-container:before{content:"";position:absolute;top:-14px;left:2%;right:2%;height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(214,180,107,.36),transparent);opacity:.65}
+.page-container .repo-card,.page-container .project-card,.page-container .settings-card,.page-container .report-card,.page-container .risk-card{border-color:color-mix(in srgb,var(--line) 82%,rgba(214,180,107,.25));}
+.page-container .repo-card:hover,.page-container .project-card:hover,.page-container .settings-card:hover,.page-container .report-card:hover,.page-container .risk-card:hover{border-color:rgba(214,180,107,.45);box-shadow:0 14px 38px rgba(0,0,0,.14),0 0 18px rgba(214,180,107,.06)}
+.topbar{border-bottom-color:rgba(214,180,107,.16)}
+.breadcrumbs b{ text-shadow:0 0 12px rgba(214,180,107,.12)}
+@media(max-width:600px){.topbar-right{gap:6px}.topbar-right .nexora-bot-orb{width:34px;height:34px}.topbar-right .nexora-bot-panel{top:44px;right:-4px}}
+@media(prefers-reduced-motion:reduce){.app-frame:after{animation:none!important}.topbar-right .nexora-bot-orb{animation:none!important}}
