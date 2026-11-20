@@ -451,7 +451,14 @@ function EmptyState({ icon: Icon = CircleHelp, title, description, action }) { r
 
 function NotificationsPage({ notifications, requests, userId, form, setForm, onSend, onRead, onReadAll, onRespond, onComplete, busy, isMock }) {
   const unread = notifications.filter(n => !n.read).length;
+  const recent = notifications.slice(0, 5);
+  const activityIcon = type => type === 'risk' || type === 'risk_scan' ? <AlertTriangle size={17}/> : type === 'analysis' || type === 'ai_analysis' ? <Sparkles size={17}/> : type === 'report' || type === 'pass_on_report' ? <FileText size={17}/> : type === 'project' || type === 'project_created' || type === 'project_updated' ? <FolderKanban size={17}/> : <Activity size={17}/>;
   return <><PageHeading kicker="LIVE WORKSPACE UPDATES" title="Notifications & handovers." description="Request a repository handover, respond to requests, and keep a history of important project updates." action={unread > 0 ? <button className="outline-button" onClick={onReadAll}>Mark all read</button> : null}/>
+    <section className="activity-panel">
+      <div className="activity-panel-head"><div><span className="eyebrow">PROJECT ACTIVITY</span><h2>What’s happening</h2><p>Important updates from your NEXORA workspace.</p></div><div className="activity-count"><b>{unread}</b><span>unread</span></div></div>
+      <div className="activity-stats"><div><span>All updates</span><b>{notifications.length}</b></div><div><span>Unread</span><b>{unread}</b></div><div><span>Handover requests</span><b>{requests.length}</b></div></div>
+      {recent.length ? <div className="activity-feed">{recent.map(n => <article key={n._id} className={`activity-item ${n.read ? 'activity-read' : 'activity-unread'}`}><div className="activity-icon">{activityIcon(n.type)}</div><div className="activity-content"><div className="activity-title-row"><b>{n.title}</b><span className="evidence-tag">{n.status || n.type || 'update'}</span></div><p>{n.message}</p><small>{new Date(n.createdAt).toLocaleString()}</small>{!n.read && <button className="outline-button activity-read-button" onClick={()=>onRead(n._id)}>Mark read</button>}</div></article>)}</div> : <div className="activity-empty"><Activity size={24}/><b>No activity yet</b><p>Project changes, AI analysis, risk scans and reports will appear here.</p></div>}
+    </section>
     {!isMock && <form onSubmit={onSend} className="memory-form" style={{marginBottom:24}}>
       <div className="eyebrow">CREATE HANDOVER REQUEST</div><h2>Pass knowledge to a teammate.</h2>
       <label>Recipient account email<input required type="email" value={form.recipientEmail} onChange={e=>setForm({...form,recipientEmail:e.target.value})} placeholder="teammate@example.com"/></label>
