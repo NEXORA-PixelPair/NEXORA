@@ -492,6 +492,7 @@ app.post('/api/github/report', auth, realAccountOnly, async (req, res) => {
       report, createdBy: user.email, status: 'pending_review', sourceSnapshotAt: report.generatedAt,
       aiProvider, reviewHistory: []
     });
+    await createNotification(req.ownerId, { title: 'Pass-on report generated', message: 'A new report for ' + repo.full_name + ' is ready for review.', type: 'project_activity' });
 
     // Surface actionable report risks in Knowledge Radar, also scoped to this account.
     for (const risk of report.riskSignals) {
