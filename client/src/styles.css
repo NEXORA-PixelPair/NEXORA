@@ -1200,3 +1200,33 @@ button:not(:disabled):active{transform:scale(.98)}
 @keyframes chipOrbitC{0%,100%{translate:0 0;rotate:0deg}50%{translate:-7px 12px;rotate:6deg}}
 @keyframes cardColorSweep{0%{background-position:0% 50%;opacity:.2}50%{background-position:100% 50%;opacity:.75}100%{background-position:0% 50%;opacity:.25}}
 @media(prefers-reduced-motion:reduce){.overview-banner,.overview-banner:before,.overview-banner:after,.banner-copy h2 em,.graphic-core,.graphic-chip,.stat-card:before{animation:none!important}}
+
+
+/* Site-wide motion system — apply a consistent animated feel to every page */
+.page-container{animation:sitePageEnter .62s cubic-bezier(.18,.8,.2,1) both}
+.page-container>.page-heading,.page-container>.welcome-block,.page-container>.section-title-row,.page-container>.form-panel,.page-container>.overview-banner,.page-container>.stats-row,.page-container>.overview-lower,.page-container>.next-step-strip,.page-container>section,.page-container>article,.page-container>.grid,.page-container>.list{animation:siteSectionEnter .65s cubic-bezier(.2,.8,.2,1) both}
+.page-container>*:nth-child(2){animation-delay:.06s}.page-container>*:nth-child(3){animation-delay:.12s}.page-container>*:nth-child(4){animation-delay:.18s}.page-container>*:nth-child(5){animation-delay:.24s}.page-container>*:nth-child(6){animation-delay:.3s}
+.page-container h1,.page-container h2{animation:siteHeadingGlow 6s ease-in-out infinite alternate}
+.page-container button:not(:disabled),.page-container a,.sidebar nav button,.topbar button{transition:transform .22s cubic-bezier(.2,.8,.2,1),filter .22s ease,box-shadow .25s ease}
+.page-container button:not(:disabled):hover,.sidebar nav button:hover,.topbar button:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.page-container button:not(:disabled):active{transform:translateY(1px) scale(.98)}
+.page-container .card,.page-container .repo-card,.page-container .project-card,.page-container .report-card,.page-container .risk-card,.page-container .source-card,.page-container .settings-card,.page-container .project-list-card,.page-container .notification-card,.page-container .form-panel{position:relative;overflow:hidden}
+.page-container .card:after,.page-container .repo-card:after,.page-container .project-card:after,.page-container .report-card:after,.page-container .risk-card:after,.page-container .source-card:after,.page-container .settings-card:after,.page-container .project-list-card:after,.page-container .notification-card:after,.page-container .form-panel:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(115deg,transparent 25%,rgba(75,220,205,.07),rgba(155,130,255,.07),transparent 72%);background-size:220% 100%;transition:opacity .25s ease;animation:siteCardSheen 12s ease-in-out infinite}
+.page-container .card:hover:after,.page-container .repo-card:hover:after,.page-container .project-card:hover:after,.page-container .report-card:hover:after,.page-container .risk-card:hover:after,.page-container .source-card:hover:after,.page-container .settings-card:hover:after,.page-container .project-list-card:hover:after,.page-container .notification-card:hover:after,.page-container .form-panel:hover:after{opacity:1}
+.page-container .eyebrow{animation:siteEyebrowPulse 5s ease-in-out infinite}
+.app-frame:before{background-size:140% 140%!important;animation:siteAmbientMotion 24s ease-in-out infinite alternate!important}
+.app-frame:after{background-size:260% 260%,100% 100%!important;animation:siteAmbientSweep 32s linear infinite!important}
+.sidebar nav button.active{box-shadow:0 0 18px rgba(43,167,154,.12);animation:navActiveGlow 3.8s ease-in-out infinite}
+.toast{animation:toastIn .35s cubic-bezier(.2,.8,.2,1) both}
+.loading-screen>*{animation:loadingFloat 2.5s ease-in-out infinite}
+@keyframes sitePageEnter{from{opacity:0;filter:blur(2px);transform:translateY(8px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes siteSectionEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes siteHeadingGlow{0%,100%{text-shadow:0 0 0 rgba(69,240,220,0)}50%{text-shadow:0 0 16px rgba(69,240,220,.09)}}
+@keyframes siteCardSheen{0%,100%{background-position:-120% 0}50%{background-position:120% 0}}
+@keyframes siteEyebrowPulse{0%,100%{opacity:.82}50%{opacity:1;text-shadow:0 0 10px rgba(69,240,220,.24)}}
+@keyframes siteAmbientMotion{0%{transform:translate3d(-1.2%,-.5%,0) scale(1)}100%{transform:translate3d(1.2%,1%,0) scale(1.05)}}
+@keyframes siteAmbientSweep{from{background-position:0% 0%,0 0}to{background-position:100% 100%,100% 100%}}
+@keyframes navActiveGlow{0%,100%{box-shadow:0 0 10px rgba(43,167,154,.08)}50%{box-shadow:0 0 18px rgba(43,167,154,.2)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes loadingFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media(prefers-reduced-motion:reduce){.page-container,.page-container>*, .page-container h1,.page-container h2,.page-container .eyebrow,.app-frame:before,.app-frame:after,.sidebar nav button.active,.toast,.loading-screen>*{animation:none!important;transition:none!important}.page-container .card:after,.page-container .repo-card:after,.page-container .project-card:after,.page-container .report-card:after,.page-container .risk-card:after,.page-container .source-card:after,.page-container .settings-card:after,.page-container .project-list-card:after,.page-container .notification-card:after,.page-container .form-panel:after{animation:none!important}}
