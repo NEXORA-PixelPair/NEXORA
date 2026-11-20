@@ -1333,3 +1333,14 @@ button:not(:disabled):active{transform:scale(.98)}
 @media(prefers-reduced-motion:reduce){.ambient-effects:before,.ambient-effects:after,.shooting-star,.graphic-ring,.graphic-chip,.graphic-core,.stat-card .stat-value,.stat-card h2,.stat-card strong,.nav-group,.nav-link.active:after,.radar-intro:before,.radar-intro:after,.risk-level,.assistant-orb,.bot-avatar,.nexora-float-bot,.nexora-bot-orb:after,.nexora-bot-panel,.bot-mini-message.assistant,.bot-typing i,.settings-card-icon svg,.report-preview,.pass-on-report-card,.notification-card:hover .notification-bell,.project-card,.project-preview{animation:none!important;transition:none!important}}
 
 .notification-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sound-toggle{border-color:rgba(69,240,220,.32)!important;color:var(--overview-cyan,#45f0dc)!important}
+
+/* Premium Upgrade Pack: glass surfaces, polished micro-interactions, responsive drawer */
+:root{--premium-glass:rgba(20,28,44,.58);--premium-border:rgba(160,190,225,.16)}
+.app-frame{background:radial-gradient(ellipse at 15% 15%,rgba(36,230,204,.10),transparent 36%),radial-gradient(ellipse at 82% 22%,rgba(129,102,255,.11),transparent 38%),radial-gradient(ellipse at 78% 88%,rgba(70,160,255,.08),transparent 34%)}
+.card,.stat-card,.project-preview,.form-panel,.settings-card,.report-card,.notification-card,.repo-card,.analysis-result,.source-card,.next-step-strip{background:var(--premium-glass)!important;backdrop-filter:blur(18px) saturate(135%);-webkit-backdrop-filter:blur(18px) saturate(135%);border:1px solid var(--premium-border)!important;box-shadow:0 12px 32px rgba(0,0,0,.13),inset 0 1px 0 rgba(255,255,255,.045)}
+button,input,textarea,select{transition:transform .18s ease,background .22s ease,border-color .22s ease,box-shadow .22s ease,opacity .18s ease}
+button:active{transform:scale(.975)}
+.page-container{animation:premiumPageIn .38s cubic-bezier(.2,.8,.2,1) both}
+@keyframes premiumPageIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){.sidebar{transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s ease}.sidebar:not(.sidebar-open){transform:translateX(-105%)}.sidebar.sidebar-open{transform:translateX(0);box-shadow:20px 0 55px rgba(0,0,0,.3)}}
+@media(prefers-reduced-motion:reduce){.page-container{animation:none!important;transition:none!important}}
