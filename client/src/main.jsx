@@ -350,7 +350,8 @@ function App() {
     { label: 'Projects', icon: FolderKanban, group: 'Workspace' },
     ...(!isMock ? [{ label: 'Repositories', icon: Github, group: 'Workspace' }] : []),
     { label: 'Pass-on reports', icon: FileCheck2, group: 'Workspace' },
-    { label: 'Notifications', icon: Bell, group: 'Workspace' },\n    { label: 'AI Assistant', icon: Bot, group: 'Intelligence' },
+    { label: 'Notifications', icon: Bell, group: 'Workspace' },
+    { label: 'AI Assistant', icon: Bot, group: 'Intelligence' },
     { label: 'Project intelligence', icon: BookOpen, group: 'Intelligence' },
     { label: 'Knowledge radar', icon: Target, group: 'Intelligence' },
     { label: 'Settings', icon: Settings, group: 'Manage' }
